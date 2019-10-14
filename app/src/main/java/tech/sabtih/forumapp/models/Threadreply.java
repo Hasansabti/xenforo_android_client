@@ -1,18 +1,27 @@
 package tech.sabtih.forumapp.models;
 
+import java.util.ArrayList;
+
 public class Threadreply {
     int id;
     String postid;
-    String username;
+
     String text;
     int likes;
+    String date;
+    Simpleuser su;
 
-    public Threadreply(int id, String postid, String username, String text, int likes) {
+    ArrayList<Threadreply> replies;
+
+
+    public Threadreply(int id, String postid, String text, int likes, String date, Simpleuser su) {
         this.id = id;
         this.postid = postid;
-        this.username = username;
         this.text = text;
         this.likes = likes;
+        this.date = date;
+        this.su = su;
+
     }
 
     public int getId() {
@@ -31,14 +40,6 @@ public class Threadreply {
         this.postid = postid;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getText() {
         return text;
     }
@@ -53,5 +54,29 @@ public class Threadreply {
 
     public void setLikes(int likes) {
         this.likes = likes;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public Simpleuser getSu() {
+        return su;
+    }
+
+    public void setSu(Simpleuser su) {
+        this.su = su;
+    }
+
+    public ArrayList<Threadreply> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(ArrayList<Threadreply> replies) {
+        this.replies = replies;
     }
 }

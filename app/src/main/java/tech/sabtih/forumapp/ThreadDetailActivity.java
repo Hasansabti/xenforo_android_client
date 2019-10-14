@@ -1,6 +1,6 @@
 package tech.sabtih.forumapp;
 
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -14,21 +14,28 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.ActionBar;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.MenuItem;
+import android.webkit.WebView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import tech.sabtih.forumapp.fragments.ThreadDetailFragment;
 import tech.sabtih.forumapp.models.Discussion;
 import tech.sabtih.forumapp.models.Forum;
 import tech.sabtih.forumapp.models.Forumcategory;
 import tech.sabtih.forumapp.models.Simpleuser;
+import tech.sabtih.forumapp.models.Threadreply;
 
 /**
  * An activity representing a single Thread detail screen. This
@@ -37,6 +44,8 @@ import tech.sabtih.forumapp.models.Simpleuser;
  * in a {@link ThreadListActivity}.
  */
 public class ThreadDetailActivity extends AppCompatActivity {
+    SharedPreferences sharedPreferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +53,10 @@ public class ThreadDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_thread_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+        sharedPreferences = getSharedPreferences("cookies", MODE_PRIVATE);
 
+
+/*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,7 +65,7 @@ public class ThreadDetailActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
+*/
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -69,6 +81,9 @@ public class ThreadDetailActivity extends AppCompatActivity {
         //
         // http://developer.android.com/guide/components/fragments.html
         //
+
+
+
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
@@ -83,128 +98,8 @@ public class ThreadDetailActivity extends AppCompatActivity {
         }
     }
 
-/*
-    private class getFCat extends AsyncTask<String,Void, ArrayList<Discussion>> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Discussion> forums) {
-            super.onPostExecute(forums);
 
 
-            recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-
-            recyclerView.setAdapter(new ThreadListActivity.SimpleItemRecyclerViewAdapter(ThreadListActivity.this,forums, mTwoPane));
-        }
-
-        @Override
-        protected ArrayList<Discussion> doInBackground(String... urls) {
-
-
-            try {
-                ArrayList<Discussion> threads = new ArrayList<>();
-
-
-
-
-
-                //Connect to the website
-                Document document = null;
-                document = Jsoup.connect("http://"+getString(R.string.url)+"/threads/"+urls[0])
-                        .data("xf_session",sharedPreferences.getString("xf_session",""))
-                        .cookie("xf_session",sharedPreferences.getString("xf_session","")).cookie("xf_user",sharedPreferences.getString("xf_user",""))
-                        .get();
-                System.out.println("sessoin: " + sharedPreferences.getString("xf_session",""));
-                Element thread= document.select(".messageList").first();
-
-
-
-
-                Elements msglist = thread.children();
-
-                for(Element n : msglist){
-                    if(n.hasClass("message")) {
-
-                        String postid = n.attr("id");
-                        int id = Integer.parseInt(n.select("postNumber").text().replace("#",""));
-                        String username = n.select(".username").text();
-                        String userid = n.select(".username").attr("href").split("\\.")[1].replace("/","");
-                        String avatar = n.select(".avatar").select("img").attr("href");
-                        Simpleuser su = new Simpleuser(Integer.parseInt(userid),username,avatar);
-
-                        Discussion d = new Discussion()
-
-
-
-
-                        String title = n.select(".categoryNodeInfo").select(".nodeTitle").text();
-
-                        Elements childs = n.select(".nodeList").first().children();
-
-
-                        ArrayList<Forum> myforums = new ArrayList<>();
-                        for(Element ch : childs){
-                            int cid = 0;
-                            String ctitle = ch.select(".nodeTitle").first().text();
-                            int discs  = -1;
-                            int msgs = -1;
-                            if(ch.select(".nodeStats")!= null) {
-                                if(ch.select(".nodeStats").select("dd").first()!= null) {
-                                    try {
-                                        discs = Integer.parseInt(ch.select(".nodeStats").select("dd").first().text().replace(",", ""));
-                                        msgs = Integer.parseInt(ch.select(".nodeStats").select("dd").last().text().replace(",", ""));
-                                    }catch (NumberFormatException ex){
-
-                                    }
-                                }
-                            }
-                            String type = "forum";
-                            if(ch.hasClass("link")){
-                                type = "link";
-                            }
-
-
-
-
-                            String url = ch.select(".nodeTitle").select("a").attr("href");
-                            String latest = ch.select(".lastThreadTitle").select("a").text();
-                            boolean isread = ch.select(".nodeInfo").hasClass("unread");
-                            String latestdate = ch.select(".lastThreadDate").text();
-                            Forum frm = new Forum(cid,ctitle,discs,msgs,url,latest,!isread,latestdate,type);
-                            myforums.add(frm);
-
-                        }
-
-
-                        Forumcategory fc = new Forumcategory(0,title,myforums);
-                        threads.add(fc);
-
-                    }
-
-
-
-
-                }
-
-                return threads;
-
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-
-            return null;
-        }
-    }
-    */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

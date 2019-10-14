@@ -1,0 +1,149 @@
+
+.bbCodeQuote .attribution {
+    color: rgb(20,20,20);
+    background: #f9d9b0 url(styles/flexile/xenforo/gradients/form-button-white-25px.png) repeat-x top;
+    border-bottom: 1px solid #f9bc6d;
+}
+
+.bbCodeBlock .type {
+    font-size: 11px;
+    font-family: 'Trebuchet MS',Helvetica,Arial,sans-serif;
+    color: rgb(228, 110, 108);
+    background: rgb(252, 217, 215) url(styles/flexile/xenforo/gradients/form-button-white-25px.png) repeat-x top;
+    padding: 3px 8px;
+    border-bottom: 1px solid rgb(238, 186, 185);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+.bbCodeQuote .attribution {
+    background: #f9d9b0 !important;
+}
+.bbCodeBlock, .attribution {
+    -webkit-border-radius: 0px !important;
+    -moz-border-radius: 0px !important;
+    -khtml-border-radius: 0px !important;
+    border-radius: 0px !important;
+}
+
+.ugc a:link, .ugc a:visited {
+    padding: 0 3px;
+    margin: 0 -3px;
+    border-radius: 5px;
+}
+
+.primaryContent a {
+    color: rgb(179,32,16);
+}
+
+.quoteContainer {
+    overflow: hidden;
+    position: relative;W
+    font-style: italic;
+    font-size: 9pt;
+    background: #fff4e5 url(styles/flexile/xenforo/gradients/category-23px-light.png) repeat-x top;
+    padding: 10px;
+    border-radius: 4px;
+}
+.bbCodeQuote .quoteContainer {
+    -webkit-border-radius: 0px !important;
+    -moz-border-radius: 0px !important;
+    -khtml-border-radius: 0px !important;
+    border-radius: 0px !important;
+}
+.bbCodeBlock pre, .bbCodeBlock blockquote {
+    margin: 0;
+}
+.baseHtml blockquote, .baseHtml ul, .baseHtml ol, .baseHtml dl {
+    margin: 1em;
+}
+body {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    font-family: 'Trebuchet MS',Helvetica,Arial,sans-serif;
+    color: rgb(20,20,20);
+
+    word-wrap: break-word;
+    line-height: 1.28;
+}
+user agent stylesheet
+blockquote {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px;
+}
+
+.quoteContainer .quote {
+    max-height: 150px;
+    overflow: hidden;
+    padding-bottom: 1px;
+}
+
+.quoteContainer .quoteExpand {
+    display: none;
+    box-sizing: border-box;
+    position: absolute;
+    height: 80px;
+    top: 90px;
+    left: 0;
+    right: 0;
+    font-size: 11px;
+    line-height: 1;
+    text-align: center;
+    color: #f9bc6d;
+    cursor: pointer;
+    padding-top: 65px;
+    background: -webkit-linear-gradient(top, rgba(255, 244, 229, 0) 0%, #fff4e5 80%);
+    background: -moz-linear-gradient(top, rgba(255, 244, 229, 0) 0%, #fff4e5 80%);
+    background: -o-linear-gradient(top, rgba(255, 244, 229, 0) 0%, #fff4e5 80%);
+    background: linear-gradient(to bottom, rgba(255, 244, 229, 0) 0%, #fff4e5 80%);
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+
+.bbCodeSpoilerButton>span {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.button {
+    font-style: normal;
+    font-size: 12px;
+    font-family: Calibri,'Trebuchet MS',Verdana,Geneva,Arial,Helvetica,sans-serif;
+    color: #6d3f03;
+    background: #fff4e5 url(styles/flexile/xenforo/gradients/form-button-white-25px.png) repeat-x top;
+    padding: 0px 6px;
+    border: 1px solid #f9d9b0;
+    border-radius: 3px;
+    text-align: center;
+    outline: none;
+    line-height: 21px;
+    display: inline-block;
+    cursor: pointer;
+    box-sizing: border-box;
+    text-shadow: 0 1px rgba(255,255,255,.2);
+    height: 23px;
+}
+select, input, button, textarea, button {
+    font: 99% arial,helvetica,clean,sans-serif;
+}
+input, button, textarea, select, optgroup, option {
+    font-family: inherit;
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+}
+
+
+
+
+a:link, a:visited {
+    color: rgb(179,32,16);
+    text-decoration: none;
+}

@@ -6,20 +6,21 @@ public class Discussion {
     int id;
     String url;
     String title;
+    String forum;
     String author;
     String cdate;
 
     ArrayList<Threadreply> treplies;
 
-    public Discussion(int id, String url, String title, String author, String cdate, ArrayList<Threadreply> treplies) {
+    public Discussion(int id, String url, String title, String forum, String author, String cdate, ArrayList<Threadreply> treplies) {
         this.id = id;
         this.url = url;
         this.title = title;
+        this.forum = forum;
         this.author = author;
         this.cdate = cdate;
         this.treplies = treplies;
     }
-
 
     public ArrayList<Threadreply> getTreplies() {
         return treplies;
@@ -69,5 +70,11 @@ public class Discussion {
         this.cdate = cdate;
     }
 
+    public String getForum() {
+        return forum;
+    }
 
+    public void setForum(String forum) {
+        this.forum = forum;
+    }
 }

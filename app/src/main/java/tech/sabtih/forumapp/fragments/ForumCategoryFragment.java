@@ -176,6 +176,8 @@ public class ForumCategoryFragment extends Fragment {
                         ArrayList<Forum> myforums = new ArrayList<>();
                         for(Element ch : childs){
                             int cid = 0;
+                            if(ch.select(".nodeTitle").first() == null)
+                                continue;
                             String ctitle = ch.select(".nodeTitle").first().text();
                             int discs  = -1;
                             int msgs = -1;

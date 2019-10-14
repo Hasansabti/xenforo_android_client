@@ -1,6 +1,7 @@
-package tech.sabtih.forumapp;
+package tech.sabtih.forumapp.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,23 +13,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import tech.sabtih.forumapp.R;
 import tech.sabtih.forumapp.adapters.MyThreadreplyRecyclerViewAdapter;
 import tech.sabtih.forumapp.dummy.DummyContent;
 import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
+import tech.sabtih.forumapp.models.Threadreply;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
+
 public class ThreadreplyFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -70,7 +68,7 @@ public class ThreadreplyFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyThreadreplyRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+           // recyclerView.setAdapter(new MyThreadreplyRecyclerViewAdapter(DummyContent.ITEMS, mListener));
         }
         return view;
     }
@@ -79,18 +77,13 @@ public class ThreadreplyFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+
     }
 
     /**
@@ -103,8 +96,5 @@ public class ThreadreplyFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
-    }
+
 }

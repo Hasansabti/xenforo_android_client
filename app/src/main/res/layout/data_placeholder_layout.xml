@@ -31,7 +31,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/ttitleph">
 
                 <View
-                    android:id="@+id/commentph"
+                    android:id="@+id/report"
                     android:layout_width="0dp"
                     android:layout_height="10dp"
                     android:layout_marginStart="24dp"

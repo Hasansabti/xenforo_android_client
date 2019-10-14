@@ -13,9 +13,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Alerts"
+            android:label="@string/title_activity_alerts"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".ThreadListActivity"
             android:label="@string/title_thread_list"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="itsjerryandharry.com"
+                    android:pathPattern="/forums"
+                    android:scheme="http" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ThreadDetailActivity"
             android:label="@string/title_thread_detail"
@@ -24,10 +40,23 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="tech.sabtih.forumapp.ThreadListActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="itsjerryandharry.com"
+                    android:pathPrefix="/threads"
+                    android:scheme="http" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".Myforums"
-            android:label="@string/title_activity_myforums">
+            android:label="@string/title_activity_myforums"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,7 +64,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Login" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

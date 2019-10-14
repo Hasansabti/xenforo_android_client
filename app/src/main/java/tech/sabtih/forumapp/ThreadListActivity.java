@@ -20,6 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -36,14 +37,19 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import tech.sabtih.forumapp.adapters.MyForumsRecyclerViewAdapter;
-import tech.sabtih.forumapp.listeners.EndlessRecyclerViewScrollListener;
+import tech.sabtih.forumapp.fragments.ThreadDetailFragment;
 import tech.sabtih.forumapp.listeners.OnForumsListInteractionListener;
 import tech.sabtih.forumapp.models.Forum;
 import tech.sabtih.forumapp.models.Simplethread;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * An activity representing a list of Threads. This activity
@@ -93,7 +99,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                         .setAction("Action", null).show();
             }
         });
-
+        mShimmerViewContainer = findViewById(R.id.shimmer_view_container);
         if (findViewById(R.id.thread_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -123,9 +129,9 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
 
         }
 
-        mShimmerViewContainer = findViewById(R.id.shimmer_view_container);
 
 
+if(nsv !=null)
         nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -261,11 +267,46 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                         String tid = n.attr("id").split("-")[1];
 
 
-                        int ID = Integer.parseInt(tid.split("0")[0]);
+
+                        int ID = Integer.parseInt(tid.trim());
                         String title = n.select(".title").text();
                         String maker = n.select(".username").first().text();
-                        String latestreplydate = n.select(".DateTime").last().text();
-                        String startdate = n.select(".DateTime").first().text();
+                        String latestreplydate = n.select(".DateTime").last().attr("data-time");
+                        String startdate = "";
+                        if(n.select(".DateTime").first().hasAttr("data-time")) {
+                            startdate = n.select(".DateTime").first().attr("data-time");
+
+                            if(!startdate.isEmpty()) {
+                                Date date = new Date((Long.parseLong(startdate) * 1000));
+                                DateFormat formatter;
+                                if (!DateUtils.isToday(date.getTime())) {
+                                    long diff = TimeUnit.DAYS.convert(date.getTime() - new Date().getTime(), TimeUnit.MILLISECONDS);
+                                    if(diff == -1){
+                                        formatter = new SimpleDateFormat("hh:mm a");
+                                        startdate = "Yesterday at "+formatter.format(date);
+                                    }else {
+                                        formatter = new SimpleDateFormat("MMM dd, YYYY hh:mm a");
+                                        startdate = formatter.format(date);
+                                    }
+                                } else {
+                                    formatter = new SimpleDateFormat("hh:mm a");
+                                    startdate = formatter.format(date);
+                                }
+
+
+                               // Log.d("daydif",title+" "+diff);
+                                //formatter.setTimeZone(TimeZone.getTimeZone("GMT+0300"));
+                                //startdate = formatter.format("Yesterday at "+date);
+
+
+
+                            }else{
+                                startdate = n.select(".DateTime").first().text();
+                            }
+                        }else{
+                            startdate = n.select(".DateTime").first().text();
+                        }
+
                         String lastreplyname = n.select(".lastPostInfo").select("a").first().text();
                         String makeravatarn = n.select("img").first().attr("src");
                         int replies = Integer.parseInt(n.select(".stats").select("dd").first().text().replace(",", ""));
@@ -376,7 +417,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                 Simplethread item = (Simplethread) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, item.getTitle());
+                    arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, ""+item.getID());
                     ThreadDetailFragment fragment = new ThreadDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -385,7 +426,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, ThreadDetailActivity.class);
-                    intent.putExtra(ThreadDetailFragment.ARG_ITEM_ID, item.getTitle());
+                    intent.putExtra(ThreadDetailFragment.ARG_ITEM_ID, ""+item.getID());
 
                     context.startActivity(intent);
                 }
@@ -440,6 +481,8 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                 myholder.views.setText("" + mValues.get(position).getViews());
                 myholder.itemView.setTag(mValues.get(position));
                 myholder.itemView.setOnClickListener(mOnClickListener);
+
+
                 myholder.date.setText(mValues.get(position).getStartdate());
                 if (mValues.get(position).isSticky()) {
                     myholder.sticky.setVisibility(View.VISIBLE);
@@ -483,7 +526,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                 author = (TextView) view.findViewById(R.id.tauthorph);
                 views = (TextView) view.findViewById(R.id.viewsph);
                 replies = (TextView) view.findViewById(R.id.repliesph);
-                comment = (TextView) view.findViewById(R.id.commentph);
+                comment = (TextView) view.findViewById(R.id.report);
                 date = view.findViewById(R.id.ttimeph);
                 avatar = view.findViewById(R.id.avatarph);
                 like = view.findViewById(R.id.likeph);
@@ -506,6 +549,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
     @Override
     protected void onResume() {
         super.onResume();
+        if(mShimmerViewContainer !=null)
         mShimmerViewContainer.startShimmerAnimation();
     }
 
