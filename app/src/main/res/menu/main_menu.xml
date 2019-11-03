@@ -3,9 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_activity_alerts" />
+        android:id="@+id/alerts"
+        android:icon="@drawable/menu_alerts"
+
+        android:title="@string/title_activity_alerts"
+        app:showAsAction="always" />
     <item
-        android:icon="@drawable/chat_unread"
-        android:title="Inbox" />
+        android:id="@+id/inbox"
+        android:icon="@drawable/menu_chat"
+        android:title="Inbox"
+        app:showAsAction="always" />
 </menu>

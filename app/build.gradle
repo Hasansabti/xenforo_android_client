@@ -33,6 +33,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
     implementation 'com.github.delight-im:Android-AdvancedWebView:v3.0.0'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation 'org.apache.commons:commons-text:1.6'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

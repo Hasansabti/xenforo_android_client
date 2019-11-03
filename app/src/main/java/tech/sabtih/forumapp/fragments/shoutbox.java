@@ -3,22 +3,19 @@ package tech.sabtih.forumapp.fragments;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
-import androidx.arch.core.util.Function;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -43,7 +40,9 @@ import org.jsoup.nodes.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 import okhttp3.Call;
@@ -60,7 +59,7 @@ import tech.sabtih.forumapp.adapters.MyChatAdapter;
 import tech.sabtih.forumapp.listeners.OnAlertsupdatedListener;
 import tech.sabtih.forumapp.listeners.OnChatInteractionListener;
 import tech.sabtih.forumapp.models.Chatmsg;
-import tech.sabtih.forumapp.models.Simpleuser;
+import tech.sabtih.forumapp.models.user.Simpleuser;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -83,6 +82,8 @@ public class shoutbox extends Fragment implements OnChatInteractionListener {
 
     PopupWindow popupWindow;
 
+    Map<String,String> emojis = new HashMap<>();
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -96,9 +97,22 @@ public class shoutbox extends Fragment implements OnChatInteractionListener {
     ArrayList<Chatmsg> messages = new ArrayList<>();
     private int lastupdate = 0;
     private int onusers;
+    View chateditor;
 
     public shoutbox() {
         // Required empty public constructor
+        emojis.put(":cool:","&#128526");
+        emojis.put(":smile:","&#128578");
+        emojis.put(":what:","&#129320");
+        emojis.put(":wink:","&#128521");
+        emojis.put(":frown:","&#128543");
+        emojis.put(":mad:","&#129324");
+        emojis.put(":confused:","&#128533");
+        emojis.put(":tongue:","&#128541");
+        emojis.put(":grin:","&#128513");
+        emojis.put(":eek:","&#128561");
+        emojis.put(":oops:","&#128559");
+        emojis.put(":rolleyes:","&#128580");
     }
 
 
@@ -172,11 +186,22 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
         sending = v.findViewById(R.id.sending);
         msgbox = v.findViewById(R.id.msgfield);
         msgbox.setTextColor(spchat.getInt("chatcolor", 0xFF000000));
+        chateditor = v.findViewById(R.id.chateditor);
+
+        if (sharedPreferences.getString("xf_user", "").isEmpty()){
+            chateditor.setVisibility(View.GONE);
+        }
         sendbtn = v.findViewById(R.id.sendbtn);
+
         sendbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String text = msgbox.getText().toString();
+                if (sharedPreferences.getString("xf_user", "").isEmpty()){
+                    Toast.makeText(getContext(), "Error: You must be logged in", Toast.LENGTH_SHORT).show();
+
+                    return;
+                }
                 if (!text.isEmpty()) {
                     sendbtn.setVisibility(View.GONE);
                     sending.setVisibility(View.VISIBLE);
@@ -211,7 +236,7 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
 
     public void deletemessage(final int id) {
         Request request = new Request.Builder()
-                .url("http://" + getString(R.string.url) + "taigachat/" + id + "/delete")
+                .url("http://" + getString(R.string.url) + "/taigachat/" + id + "/delete")
                 .post(new FormBody.Builder()
                         .add("_xfToken", sharedPreferences.getString("_xfToken", ""))
                         .add("_xfResponseType", "json")
@@ -344,11 +369,26 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
                                 String textcolor = "#000000";
                                 if (el.select("span").last() != null && el.select("span").last().hasAttr("style") && el.select("span").last().attr("style").contains("color"))
                                     textcolor = el.select("span").last().attr("style").split(":")[1].trim();
+                                //Log.d("Emoji","Images: " + el.select("img").size());
+                                if(el.select("img").size() >0){
+                                 //   Log.d("Emoji",el.select(".taigachat_messagetext").select("img").first().attr("title").substring(el.select(".taigachat_messagetext").select("img").first().attr("title").indexOf(":"),el.select(".taigachat_messagetext").select("img").first().attr("title").indexOf(":",el.select(".taigachat_messagetext").select("img").first().attr("title").indexOf(":"))));
+
+                                    for(Element emoj : el.select("img")){
+
+                                        if(emoj.hasAttr("title")){
+                                            Log.d("Emoji",emoj.attr("src") +" " + emoj.attr("title").substring(emoj.attr("title").indexOf(":"),emoj.attr("title").indexOf(":",emoj.attr("title").indexOf(":")+1))+":");
+                                            if(emojis.containsKey(emoj.attr("title").substring(emoj.attr("title").indexOf(":"),emoj.attr("title").indexOf(":",emoj.attr("title").indexOf(":")+1))+":")){
+                                                emoj.prepend(emojis.get(emoj.attr("title").substring(emoj.attr("title").indexOf(":"),emoj.attr("title").indexOf(":",emoj.attr("title").indexOf(":")+1))+":"));
+                                            }
+
+                                        }
+                                    }
+                                }
                                 String msgtext = "";
                                 if (el.select(".taigachat_messagetext").last() != null) {
                                     msgtext = el.select(".taigachat_messagetext").last().html();
-                                    msgtext = msgtext.replace("<img src=\"styles/default/xenforo/clear.png\" class=\"mceSmilieSprite mceSmilie6\" alt=\":cool:\" title=\"Cool    :cool:\">", "&#128526")
-                                            .replace("<img src=\"styles/default/xenforo/clear.png\" class=\"mceSmilieSprite mceSmilie12\" alt=\":what:\" title=\"Er... what?    :what:\">", "&#129320");
+                                  //  msgtext = msgtext.replace("<img src=\"styles/default/xenforo/clear.png\" class=\"mceSmilieSprite mceSmilie6\" alt=\":cool:\" title=\"Cool    :cool:\">", "&#128526")
+                                  //          .replace("<img src=\"styles/default/xenforo/clear.png\" class=\"mceSmilieSprite mceSmilie12\" alt=\":what:\" title=\"Er... what?    :what:\">", "&#129320");
 
 
                                 }
@@ -395,6 +435,7 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
                                     chatadapter = new MyChatAdapter(messages, shoutbox.this);
                                     rv.setAdapter(chatadapter);
                                     rv.smoothScrollToPosition(chatadapter.getItemCount());
+                                    registerForContextMenu(rv);
                                 } else {
                                     chatadapter.setItems(messages);
                                     chatadapter.notifyDataSetChanged();
@@ -414,6 +455,13 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
             }
         });
 
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+
+        deletemessage(Integer.parseInt(chatadapter.getSelectedID()));
+        return super.onContextItemSelected(item);
     }
 
     public void showPopup(View v) {
@@ -579,6 +627,14 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
     @Override
     public void onChatInteraction(Chatmsg item) {
 
+    }
+
+    public void loggedout() {
+        chateditor.setVisibility(View.GONE);
+    }
+
+    public void loggedin() {
+        chateditor.setVisibility(View.VISIBLE);
     }
 
     /**

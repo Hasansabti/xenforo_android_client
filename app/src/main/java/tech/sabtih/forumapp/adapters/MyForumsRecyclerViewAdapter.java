@@ -1,6 +1,8 @@
 package tech.sabtih.forumapp.adapters;
 
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.PorterDuff;
@@ -11,19 +13,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import tech.sabtih.forumapp.Myforums;
 import tech.sabtih.forumapp.R;
 import tech.sabtih.forumapp.listeners.OnForumsListInteractionListener;
 import tech.sabtih.forumapp.models.Forum;
+import tech.sabtih.forumapp.models.Forumcategory;
 
 import java.util.List;
 
 
 public class MyForumsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private final List<Forum> mValues;
+    private final List<Object> mValues;
     private final OnForumsListInteractionListener mListener;
 
-    public MyForumsRecyclerViewAdapter(List<Forum> items, OnForumsListInteractionListener listener) {
+    public MyForumsRecyclerViewAdapter(List<Object> items, OnForumsListInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -36,10 +40,16 @@ public class MyForumsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_forum_link, parent, false);
             return new ViewHolderLink(view);
-        }else{
+        }else if(viewType == 2){
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_forums, parent, false);
             return  new ViewHolderForum(view);
+        }else if(viewType == 3){
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_forumcategory, parent, false);
+            return  new ViewHolderCategory(view);
+        }else{
+            return null;
         }
 
     }
@@ -47,11 +57,18 @@ public class MyForumsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public int getItemViewType(int position) {
-        Forum f = mValues.get(position);
-        if(f.getType().equals("link")){
-            return 1;
+        if(mValues.get(position) instanceof Forum) {
+            Forum f = (Forum) mValues.get(position);
+            if (f.getType().equals("link")) {
+                return 1;
+            } else {
+                return 2;
+            }
+        }else if(mValues.get(position) instanceof Forumcategory){
+            Forumcategory fc = (Forumcategory) mValues.get(position);
+            return 3;
         }else{
-            return 2;
+            return -1;
         }
     }
 
@@ -60,16 +77,37 @@ public class MyForumsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         if(holder.getItemViewType() == 1){
             initForumLink((ViewHolderLink) holder,position);
-        }else {
+        }else if(holder.getItemViewType() == 2) {
             initForum((ViewHolderForum) holder,position);
+        }else if(holder.getItemViewType() == 3) {
+            initForumCat((ViewHolderCategory) holder,position);
         }
 
 
     }
+    private void initForumCat(final ViewHolderCategory holder, int position){
+        holder.mItem = (Forumcategory) mValues.get(position);
+        // holder.mIdView.setText(mValues.get(position).id);
+        //  holder.mContentView.setText(mValues.get(position).content);
+        holder.title.setText(holder.mItem.getTitle());
 
+
+        /*
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mListener) {
+                    // Notify the active callbacks interface (the activity, if the
+                    // fragment is attached to one) that an item has been selected.
+                    mListener.onListFragmentInteraction(holder.mItem);
+                }
+            }
+        });
+        */
+    }
     private void initForum(final ViewHolderForum holder, int position){
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(""+mValues.get(position).getTitle());
+        holder.mItem = (Forum) mValues.get(position);
+        holder.mIdView.setText(""+holder.mItem.getTitle());
         if(holder.mItem.getMessages() == -1){
             holder.messages.setText("-");
         }else {
@@ -109,9 +147,10 @@ public class MyForumsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     private void initForumLink(final ViewHolderLink holder, int position){
+        holder.mItem = (Forum) mValues.get(position);
 
 
-        holder.mIdView.setText(""+mValues.get(position).getTitle());
+        holder.mIdView.setText(""+holder.mItem.getTitle());
 
 
 
@@ -180,6 +219,28 @@ public class MyForumsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             frmimage = view.findViewById(R.id.frm_img);
 
             //mContentView = (TextView) view.findViewById(R.id.forum_id);
+        }
+
+
+    }
+
+    public class ViewHolderCategory extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final TextView title;
+
+        //  public final TextView mContentView;
+        public Forumcategory mItem;
+
+
+        public ViewHolderCategory(View view) {
+            super(view);
+            mView = view;
+            title = view.findViewById(R.id.cattitle);
+            //mIdView = (TextView) view.findViewById(R.id.item_number);
+            //  mContentView = (TextView) view.findViewById(R.id.content);
+
+            //  if(mItem != null)
+            // flist.initForums(mItem.getChilds());
         }
 
 

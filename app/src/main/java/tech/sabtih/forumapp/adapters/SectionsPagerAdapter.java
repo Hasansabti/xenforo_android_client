@@ -1,4 +1,4 @@
-package tech.sabtih.forumapp.ui.main;
+package tech.sabtih.forumapp.adapters;
 
 import android.content.Context;
 
@@ -7,6 +7,9 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import tech.sabtih.forumapp.R;
 
@@ -19,7 +22,10 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_1, R.string.tab_text_2};
     private final Context mContext;
-
+    private final List<Fragment> mFragmentList = new ArrayList<>();
+    public void addFragment(Fragment fragment) {
+        mFragmentList.add(fragment);
+    }
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
@@ -27,9 +33,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        // getItem is called to instantiate the fragment for the given page.
-        // Return a PlaceholderFragment (defined as a static inner class below).
-        return PlaceholderFragment.newInstance(position + 1);
+        return mFragmentList.get(position);
     }
 
     @Nullable

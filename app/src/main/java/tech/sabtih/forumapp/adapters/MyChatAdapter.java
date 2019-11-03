@@ -3,7 +3,8 @@ package tech.sabtih.forumapp.adapters;
 import android.os.Build;
 import android.text.Html;
 import android.text.format.DateUtils;
-import android.util.Log;
+import android.text.method.LinkMovementMethod;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+import tech.sabtih.forumapp.fragments.ThreadDetailFragment;
+import tech.sabtih.forumapp.utils.PicassoImageGetter;
 import tech.sabtih.forumapp.R;
 import tech.sabtih.forumapp.fragments.shoutbox;
 import tech.sabtih.forumapp.listeners.OnChatInteractionListener;
@@ -32,6 +32,7 @@ public class MyChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     private List<Chatmsg> mValues;
     private final OnChatInteractionListener mListener;
+    private String selectedid;
 
     public MyChatAdapter(List<Chatmsg> items, OnChatInteractionListener listener) {
         mValues = items;
@@ -96,28 +97,58 @@ public class MyChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         //formatter.setTimeZone(TimeZone.getTimeZone("GMT+0300"));
         String dateFormatted = formatter.format(date);
         holder.time.setText(dateFormatted);
+        holder.mView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+                contextMenu.setHeaderTitle("Message Tools");
+                contextMenu.add(0, view.getId(),0,"Delete Message");
+            }
+
+        });
+        holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                selectedid = holder.mItem.getMsgid();
+                return false;
+            }
+        });
+
     }
 
     private void initOthers(final ViewHolderThem holder, int position) {
         holder.mItem = mValues.get(position);
        // holder.msg.setText(holder.mItem.getMsg());
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            holder.msg.setText(Html.fromHtml(holder.mItem.getMsg(), Html.FROM_HTML_MODE_COMPACT));
+  /*      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            holder.msg.setText(Html.fromHtml(holder.mItem.getMsg(),new Html.ImageGetter() {
+                @Override
+                public Drawable getDrawable(String s) {
+                    return null;
+                }
+            }, Html.FROM_HTML_MODE_COMPACT));
         } else {
-            holder.msg.setText(Html.fromHtml(holder.mItem.getMsg()));
-        }
+         */
+  holder.msg.setMovementMethod(LinkMovementMethod.getInstance());
+  holder.msg.setText(Html.fromHtml(holder.mItem.getMsg(), new PicassoImageGetter(holder.msg,((shoutbox)mListener).getResources(),Picasso.get()), null));
+
+       // }
 
         Date date = new Date((Long.parseLong( holder.mItem.getDate())*1000));
+
+
         DateFormat formatter = new SimpleDateFormat("dd-MM-YYYY hh:mm:ss a");
+        String dateFormatted = "";
         if(!DateUtils.isToday(date.getTime())){
-            formatter = new SimpleDateFormat("MMM dd, YYYY hh:mm a");
+           // formatter = new SimpleDateFormat("MMM dd, YYYY hh:mm a");
+            dateFormatted = ThreadDetailFragment.getDisplayableTime(date.getTime());
         }else{
             formatter = new SimpleDateFormat(" hh:mm a");
+            dateFormatted = formatter.format(date);
         }
 
         //formatter.setTimeZone(TimeZone.getTimeZone("GMT+0300"));
-        String dateFormatted = formatter.format(date);
+
 
         holder.name.setText(holder.mItem.getUser().getName());
         holder.time.setText(dateFormatted);
@@ -151,6 +182,10 @@ public class MyChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
 
 
+    }
+
+    public String getSelectedID() {
+        return selectedid;
     }
 
     public class ViewHolderThem extends RecyclerView.ViewHolder {

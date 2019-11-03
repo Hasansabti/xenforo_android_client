@@ -1,9 +1,11 @@
 package tech.sabtih.forumapp.models;
 
+import tech.sabtih.forumapp.models.user.Simpleuser;
+
 public class Simplethread {
     private int ID;
     private String title;
-    private String maker;
+    private Simpleuser maker;
     private String latestreplydate;
     private String startdate;
     private String lastreplyname;
@@ -12,8 +14,9 @@ public class Simplethread {
     private int views;
     private boolean isread;
     private boolean isticky;
+    private int pages = 1;
 
-    public Simplethread(int ID, String title, String maker, String latestreplydate, String startdate, String lastreplyname, String makeravatar, int replies, int views, boolean isread, boolean isticky) {
+    public Simplethread(int ID, String title, Simpleuser maker, String latestreplydate, String startdate, String lastreplyname, String makeravatar, int replies, int views, boolean isread, boolean isticky) {
         this.ID = ID;
         this.title = title;
         this.maker = maker;
@@ -51,11 +54,11 @@ public class Simplethread {
         this.title = title;
     }
 
-    public String getMaker() {
+    public Simpleuser getMaker() {
         return maker;
     }
 
-    public void setMaker(String maker) {
+    public void setMaker(Simpleuser maker) {
         this.maker = maker;
     }
 
@@ -113,5 +116,13 @@ public class Simplethread {
 
     public void setIsticky(boolean isticky) {
         this.isticky = isticky;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
     }
 }

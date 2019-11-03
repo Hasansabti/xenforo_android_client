@@ -1,4 +1,4 @@
-package tech.sabtih.forumapp.ui.main;
+package tech.sabtih.forumapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import tech.sabtih.forumapp.R;
+import tech.sabtih.forumapp.models.PageViewModel;
 
 /**
  * A placeholder fragment containing a simple view.

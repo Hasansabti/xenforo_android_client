@@ -229,7 +229,7 @@ public class NewsFragment extends Fragment {
             mListener = (OnNewsListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnNameChangeInteractionListener");
         }
     }
 

@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -26,7 +28,7 @@ import java.util.ArrayList;
 import tech.sabtih.forumapp.Login;
 import tech.sabtih.forumapp.R;
 import tech.sabtih.forumapp.models.Newsitem;
-import tech.sabtih.forumapp.models.User;
+import tech.sabtih.forumapp.models.user.User;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -218,8 +220,8 @@ public class AccountFragment extends Fragment {
                 int points = Integer.parseInt( document.select(".infoblock").first().select("dl").get(4).select("a").first().text());
                 int messages = Integer.parseInt( document.select(".infoblock").first().select("dl").get(2).select("dd").first().text().replace(",",""));
                 int likes = Integer.parseInt( document.select(".infoblock").first().select("dl").get(2).select("dd").first().text().replace(",",""));
-
-                User user = new User(id,username,title,status,points,followers,following, messages);
+                String  avatar = document.select(".avatarScaler").select("img").attr("src");
+                User user = new User(id,username,title,status,points,followers,following, messages,avatar);
 
 
 
@@ -258,6 +260,7 @@ public class AccountFragment extends Fragment {
         following.setText(""+user.getFollowing());
         followers.setText(""+user.getFollowers());
         points.setText(""+user.getMessages());
+        Picasso.get().load(user.getAvatar()).into(avatar);
 
 
 

@@ -12,23 +12,24 @@ import android.widget.TextView;
 
 import tech.sabtih.forumapp.Myforums;
 import tech.sabtih.forumapp.R;
-import tech.sabtih.forumapp.fragments.ForumCategoryFragment.OnListFragmentInteractionListener;
+
 import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
+import tech.sabtih.forumapp.listeners.OnForumsListInteractionListener;
 import tech.sabtih.forumapp.models.Forumcategory;
 
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * specified {@link OnForumsListInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyForumCategoryRecyclerViewAdapter extends RecyclerView.Adapter<MyForumCategoryRecyclerViewAdapter.ViewHolder> {
 
     private final List<Forumcategory> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final OnForumsListInteractionListener mListener;
 
-    public MyForumCategoryRecyclerViewAdapter(List<Forumcategory> items, OnListFragmentInteractionListener listener) {
+    public MyForumCategoryRecyclerViewAdapter(List<Forumcategory> items, OnForumsListInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -47,9 +48,10 @@ public class MyForumCategoryRecyclerViewAdapter extends RecyclerView.Adapter<MyF
       //  holder.mContentView.setText(mValues.get(position).content);
         holder.title.setText(holder.mItem.getTitle());
 
-        holder.flist.setLayoutManager(new LinearLayoutManager(holder.flist.getContext()));
-        holder.flist.setAdapter(new MyForumsRecyclerViewAdapter(holder.mItem.getChilds(),(Myforums)mListener));
-        holder.flist.addItemDecoration(new DividerItemDecoration(holder.flist.getContext(), DividerItemDecoration.VERTICAL));
+     //   holder.flist.setLayoutManager(new LinearLayoutManager(holder.flist.getContext()));
+     //   holder.flist.setAdapter(new MyForumsRecyclerViewAdapter(holder.mItem.getChilds(),(Myforums)mListener));
+     //   holder.flist.addItemDecoration(new DividerItemDecoration(holder.flist.getContext(), DividerItemDecoration.VERTICAL));
+        /*
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,6 +62,7 @@ public class MyForumCategoryRecyclerViewAdapter extends RecyclerView.Adapter<MyF
                 }
             }
         });
+        */
     }
 
     @Override
@@ -70,7 +73,7 @@ public class MyForumCategoryRecyclerViewAdapter extends RecyclerView.Adapter<MyF
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView title;
-        public final RecyclerView flist;
+      //  public final RecyclerView flist;
       //  public final TextView mContentView;
         public Forumcategory mItem;
 
@@ -81,7 +84,7 @@ public class MyForumCategoryRecyclerViewAdapter extends RecyclerView.Adapter<MyF
             title = view.findViewById(R.id.cattitle);
             //mIdView = (TextView) view.findViewById(R.id.item_number);
           //  mContentView = (TextView) view.findViewById(R.id.content);
-            flist = view.findViewById(R.id.forums_list);
+          //  flist = view.findViewById(R.id.forums_list);
           //  if(mItem != null)
            // flist.initForums(mItem.getChilds());
         }

@@ -2,6 +2,8 @@ package tech.sabtih.forumapp.models;
 
 import java.util.ArrayList;
 
+import tech.sabtih.forumapp.models.user.Simpleuser;
+
 public class Threadreply {
     int id;
     String postid;

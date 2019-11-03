@@ -1,3 +1,27 @@
+.bbCodeSpoilerText {
+
+    background-color: rgb(252, 241, 240);
+    padding: 5px;
+    margin-top: 5px;
+    transition: all 1s linear;
+    display: block;
+    margin-bottom: 5px;
+    border: 1px solid rgb(252, 217, 215);
+    border-radius: 5px;
+    overflow: auto;
+
+}
+
+.hidden {
+  display: none;
+}
+
+.visuallyhidden {
+  opacity: 0;
+  height:0;
+  padding:0;
+  border: 0px;
+}
 
 .bbCodeQuote .attribution {
     color: rgb(20,20,20);

@@ -8,14 +8,21 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import tech.sabtih.forumapp.ProfileActivity;
 import tech.sabtih.forumapp.adapters.MyProfilepostRecyclerViewAdapter;
 import tech.sabtih.forumapp.R;
-import tech.sabtih.forumapp.dummy.DummyContent;
 import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
+import tech.sabtih.forumapp.listeners.OnProfileInteractionListener;
+import tech.sabtih.forumapp.models.user.User;
 
 /**
  * A fragment representing a list of Items.
@@ -23,25 +30,41 @@ import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ProfilepostFragment extends Fragment {
+public class ProfileFragment extends Fragment {
+
+
+    TextView username;
+    TextView customt;
+    TextView status;
+    TextView points;
+    TextView followers;
+    TextView following;
+    TextView lastseen;
+    ImageView avatar;
+    RecyclerView postsrv;
+
+    MyProfilepostRecyclerViewAdapter adapter;
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private OnProfileInteractionListener mListener;
+    User user;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ProfilepostFragment() {
+    public ProfileFragment(User user) {
+        this.user = user;
+
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ProfilepostFragment newInstance(int columnCount) {
-        ProfilepostFragment fragment = new ProfilepostFragment();
+    public static ProfileFragment newInstance(int columnCount, User user) {
+        ProfileFragment fragment = new ProfileFragment(user);
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -60,8 +83,18 @@ public class ProfilepostFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profilepost_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        username = view.findViewById(R.id.username);
+        customt = view.findViewById(R.id.custitle);
+        status = view.findViewById(R.id.stat);
+        points = view.findViewById(R.id.user_points);
+        followers = view.findViewById(R.id.user_followers);
+        following = view.findViewById(R.id.user_following);
+        avatar = view.findViewById(R.id.avatarph);
+        postsrv = view.findViewById(R.id.profileposts);
+        lastseen = view.findViewById(R.id.lastseen);
+        setUser(user);
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -71,7 +104,7 @@ public class ProfilepostFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyProfilepostRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            /// recyclerView.setAdapter(new MyProfilepostRecyclerViewAdapter(DummyContent.ITEMS, mListener));
         }
         return view;
     }
@@ -80,11 +113,11 @@ public class ProfilepostFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnProfileInteractionListener) {
+            mListener = (OnProfileInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnNameChangeInteractionListener");
         }
     }
 
@@ -104,6 +137,31 @@ public class ProfilepostFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
+
+
+    public void setUser(User user) {
+        customt.setText(user.getTitle());
+        username.setText(user.getName());
+        status.setText(user.getStatus());
+        following.setText("" + user.getFollowing());
+        followers.setText("" + user.getFollowers());
+        points.setText("" + user.getMessages());
+        lastseen.setText(user.getLastActivity());
+        Picasso.get().load(user.getAvatar()).into(avatar);
+
+
+        adapter = new MyProfilepostRecyclerViewAdapter(user.getProfileposts(), ((ProfileActivity)mListener));
+        LinearLayoutManager layout = new LinearLayoutManager(postsrv.getContext());
+        //layout
+        postsrv.setLayoutManager(layout);
+        postsrv.setAdapter(adapter);
+
+
+        Log.d("Cover",getString(R.string.url)+"/"+ user.getCover());
+
+
+
+    }
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(DummyItem item);

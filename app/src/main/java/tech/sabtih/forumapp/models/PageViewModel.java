@@ -1,4 +1,4 @@
-package tech.sabtih.forumapp.ui.main;
+package tech.sabtih.forumapp.models;
 
 import androidx.arch.core.util.Function;
 import androidx.lifecycle.LiveData;

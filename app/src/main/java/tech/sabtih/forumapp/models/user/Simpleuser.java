@@ -1,4 +1,4 @@
-package tech.sabtih.forumapp.models;
+package tech.sabtih.forumapp.models.user;
 
 public class Simpleuser {
     int id;

@@ -1,41 +1,18 @@
 package tech.sabtih.forumapp;
 
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.widget.Toolbar;
 
-import android.view.View;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.MenuItem;
-import android.webkit.WebView;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.w3c.dom.Text;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 import tech.sabtih.forumapp.fragments.ThreadDetailFragment;
-import tech.sabtih.forumapp.models.Discussion;
-import tech.sabtih.forumapp.models.Forum;
-import tech.sabtih.forumapp.models.Forumcategory;
-import tech.sabtih.forumapp.models.Simpleuser;
-import tech.sabtih.forumapp.models.Threadreply;
 
 /**
  * An activity representing a single Thread detail screen. This
@@ -72,15 +49,6 @@ public class ThreadDetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        // savedInstanceState is non-null when there is fragment state
-        // saved from previous configurations of this activity
-        // (e.g. when rotating the screen from portrait to landscape).
-        // In this case, the fragment will automatically be re-added
-        // to its container so we don't need to manually add it.
-        // For more information, see the Fragments API guide at:
-        //
-        // http://developer.android.com/guide/components/fragments.html
-        //
 
 
 
@@ -90,6 +58,13 @@ public class ThreadDetailActivity extends AppCompatActivity {
             Bundle arguments = new Bundle();
             arguments.putString(ThreadDetailFragment.ARG_ITEM_ID,
                     getIntent().getStringExtra(ThreadDetailFragment.ARG_ITEM_ID));
+            arguments.putString("pages",
+                    getIntent().getStringExtra("pages"));
+            if(getIntent().getData() != null){
+                Log.d("thread url",getIntent().getData().getPath());
+                arguments.putString("url",getIntent().getData().getPath());
+            }
+
             ThreadDetailFragment fragment = new ThreadDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

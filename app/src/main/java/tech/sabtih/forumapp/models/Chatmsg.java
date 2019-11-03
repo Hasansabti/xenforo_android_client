@@ -1,5 +1,7 @@
 package tech.sabtih.forumapp.models;
 
+import tech.sabtih.forumapp.models.user.Simpleuser;
+
 public class Chatmsg {
     int ID;
     String msgid;

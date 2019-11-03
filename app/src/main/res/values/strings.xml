@@ -11,6 +11,7 @@
     <string name="title_thread_list">Threads</string>
     <string name="title_thread_detail">Thread Detail</string>
     <string name="title_activity_alerts">Alerts</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
+    <string name="tab_text_1">Alerts</string>
+    <string name="tab_text_2">Inbox</string>
+    <string name="title_activity_profile">ProfileActivity</string>
 </resources>

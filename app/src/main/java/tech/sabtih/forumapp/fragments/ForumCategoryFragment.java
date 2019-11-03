@@ -30,6 +30,7 @@ import tech.sabtih.forumapp.R;
 import tech.sabtih.forumapp.adapters.MyForumsRecyclerViewAdapter;
 import tech.sabtih.forumapp.dummy.DummyContent;
 import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
+import tech.sabtih.forumapp.listeners.OnForumsListInteractionListener;
 import tech.sabtih.forumapp.models.Forum;
 import tech.sabtih.forumapp.models.Forumcategory;
 
@@ -38,7 +39,7 @@ import static android.content.Context.MODE_PRIVATE;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnForumsListInteractionListener}
  * interface.
  */
 public class ForumCategoryFragment extends Fragment {
@@ -49,7 +50,7 @@ public class ForumCategoryFragment extends Fragment {
     private int mColumnCount = 1;
     SharedPreferences sharedPreferences;
     RecyclerView recyclerView;
-    private OnListFragmentInteractionListener mListener;
+    private OnForumsListInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -87,11 +88,11 @@ public class ForumCategoryFragment extends Fragment {
             Context context = view.getContext();
              recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
-               // recyclerView.setLayoutManager(new LinearLayoutManager(context));
+               //
             } else {
               //  recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-
+          //  recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -122,7 +123,7 @@ public class ForumCategoryFragment extends Fragment {
         new getFCat().execute();
     }
 
-    private class getFCat extends AsyncTask<Void,Void, ArrayList<Forumcategory>> {
+    private class getFCat extends AsyncTask<Void,Void, ArrayList<Object>> {
 
         @Override
         protected void onPreExecute() {
@@ -130,21 +131,21 @@ public class ForumCategoryFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Forumcategory> forums) {
+        protected void onPostExecute(ArrayList<Object> forums) {
             super.onPostExecute(forums);
 
 
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            recyclerView.setAdapter(new MyForumCategoryRecyclerViewAdapter(forums, mListener));
+            recyclerView.setAdapter(new MyForumsRecyclerViewAdapter(forums, mListener));
         }
 
         @Override
-        protected ArrayList<Forumcategory> doInBackground(Void... voids) {
+        protected ArrayList<Object> doInBackground(Void... voids) {
 
 
             try {
-                ArrayList<Forumcategory> mycats = new ArrayList<>();
+                ArrayList<Object> mycats = new ArrayList<>();
 
 
 
@@ -173,7 +174,10 @@ public class ForumCategoryFragment extends Fragment {
                         Elements childs = n.select(".nodeList").first().children();
 
 
-                        ArrayList<Forum> myforums = new ArrayList<>();
+                      //  ArrayList<Forum> myforums = new ArrayList<>();
+                        Forumcategory fc = new Forumcategory(0,title,null);
+                        mycats.add(fc);
+
                         for(Element ch : childs){
                             int cid = 0;
                             if(ch.select(".nodeTitle").first() == null)
@@ -195,6 +199,7 @@ public class ForumCategoryFragment extends Fragment {
                             String type = "forum";
                             if(ch.hasClass("link")){
                                 type = "link";
+                                continue;
                             }
 
 
@@ -205,13 +210,12 @@ public class ForumCategoryFragment extends Fragment {
                             boolean isread = ch.select(".nodeInfo").hasClass("unread");
                             String latestdate = ch.select(".lastThreadDate").text();
                             Forum frm = new Forum(cid,ctitle,discs,msgs,url,latest,isread,latestdate,type);
-                            myforums.add(frm);
+                            mycats.add(frm);
 
                         }
 
 
-                        Forumcategory fc = new Forumcategory(0,title,myforums);
-                        mycats.add(fc);
+
 
                     }
 
@@ -237,11 +241,11 @@ public class ForumCategoryFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnForumsListInteractionListener) {
+            mListener = (OnForumsListInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnNameChangeInteractionListener");
         }
     }
 
@@ -251,18 +255,5 @@ public class ForumCategoryFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(Forumcategory item);
-    }
+
 }

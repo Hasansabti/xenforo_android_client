@@ -24,9 +24,10 @@
         tools:listitem="@layout/chat_recieved" />
 
     <LinearLayout
+
+        android:id="@+id/chateditor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="150px"
         android:background="@drawable/send_box"
         android:orientation="horizontal">
 
@@ -44,8 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="2"
             android:ems="10"
-            android:imeOptions="actionDone"
             android:hint="Write a message"
+            android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:paddingHorizontal="10dp"
 

@@ -90,10 +90,11 @@ ProgressBar pb;
         {
             pb.setVisibility(View.GONE);
 
+//xf_user
 
-
-            if(url.contains("logout/?_xfToken")){
+            if(url.contains("logout")){
                 editor.putString("_xfToken", "");
+                editor.putString("xf_user", "");
 
             }else {
                 for (String s : CookieManager.getInstance().getCookie(url).split(" ")) {

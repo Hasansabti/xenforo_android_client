@@ -41,6 +41,7 @@ import tech.sabtih.forumapp.fragments.ThreadDetailFragment;
 import tech.sabtih.forumapp.listeners.OnForumsListInteractionListener;
 import tech.sabtih.forumapp.models.Forum;
 import tech.sabtih.forumapp.models.Simplethread;
+import tech.sabtih.forumapp.models.user.Simpleuser;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -48,7 +49,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -72,7 +72,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
     TextView nothreads;
     private ShimmerFrameLayout mShimmerViewContainer;
     SimpleItemRecyclerViewAdapter threadsadapter;
-    public ArrayList<Forum> subforums = new ArrayList<>();
+    public ArrayList<Object> subforums = new ArrayList<>();
     public ArrayList<Simplethread> threadslist = new ArrayList<>();
     boolean isRecyclerViewWaitingtoLaadData = false;
     boolean loadedAllItems = false;
@@ -130,42 +130,41 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
         }
 
 
+        if (nsv != null)
+            nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+                @Override
+                public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                    String TAG = "nested_sync";
+                    if (scrollY > oldScrollY) {
+                        Log.i(TAG, "Scroll DOWN");
+                    }
+                    if (scrollY < oldScrollY) {
+                        Log.i(TAG, "Scroll UP");
+                    }
 
-if(nsv !=null)
-        nsv.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                String TAG = "nested_sync";
-                if (scrollY > oldScrollY) {
-                    Log.i(TAG, "Scroll DOWN");
-                }
-                if (scrollY < oldScrollY) {
-                    Log.i(TAG, "Scroll UP");
-                }
+                    if (scrollY == 0) {
+                        Log.i(TAG, "TOP SCROLL");
+                    }
 
-                if (scrollY == 0) {
-                    Log.i(TAG, "TOP SCROLL");
-                }
-
-                if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
-                    Log.i(TAG, "BOTTOM SCROLL");
-                    if (!isRecyclerViewWaitingtoLaadData && multipage) //check for scroll down
-                    {
-                        isRecyclerViewWaitingtoLaadData = true;
+                    if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                        Log.i(TAG, "BOTTOM SCROLL");
+                        if (!isRecyclerViewWaitingtoLaadData && multipage) //check for scroll down
+                        {
+                            isRecyclerViewWaitingtoLaadData = true;
 
 
-                        if (page < totalpages) {
-                            page++;
-                            new getFCat().execute(url + "page-" + page);
-                            Log.d("ThreadList", "Loading page:" + page);
+                            if (page < totalpages) {
+                                page++;
+                                new getFCat().execute(url + "page-" + page);
+                                Log.d("ThreadList", "Loading page:" + page);
+
+                            }
 
                         }
-
                     }
                 }
-            }
 
-        });
+            });
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -186,10 +185,11 @@ if(nsv !=null)
         }
 
     }
-    public boolean onOptionsItemSelected(MenuItem item){
+
+    public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id==android.R.id.home) {
+        if (id == android.R.id.home) {
             finish();
             return true;
         }
@@ -267,24 +267,24 @@ if(nsv !=null)
                         String tid = n.attr("id").split("-")[1];
 
 
-
                         int ID = Integer.parseInt(tid.trim());
                         String title = n.select(".title").text();
                         String maker = n.select(".username").first().text();
+                        int makerid = Integer.parseInt( n.select(".posterAvatar").select("a").first().attr("href").split("\\.")[1].replace("/","").trim());
                         String latestreplydate = n.select(".DateTime").last().attr("data-time");
                         String startdate = "";
-                        if(n.select(".DateTime").first().hasAttr("data-time")) {
+                        if (n.select(".DateTime").first().hasAttr("data-time")) {
                             startdate = n.select(".DateTime").first().attr("data-time");
 
-                            if(!startdate.isEmpty()) {
+                            if (!startdate.isEmpty()) {
                                 Date date = new Date((Long.parseLong(startdate) * 1000));
                                 DateFormat formatter;
                                 if (!DateUtils.isToday(date.getTime())) {
                                     long diff = TimeUnit.DAYS.convert(date.getTime() - new Date().getTime(), TimeUnit.MILLISECONDS);
-                                    if(diff == -1){
+                                    if (diff == -1) {
                                         formatter = new SimpleDateFormat("hh:mm a");
-                                        startdate = "Yesterday at "+formatter.format(date);
-                                    }else {
+                                        startdate = "Yesterday at " + formatter.format(date);
+                                    } else {
                                         formatter = new SimpleDateFormat("MMM dd, YYYY hh:mm a");
                                         startdate = formatter.format(date);
                                     }
@@ -294,17 +294,20 @@ if(nsv !=null)
                                 }
 
 
-                               // Log.d("daydif",title+" "+diff);
+                                // Log.d("daydif",title+" "+diff);
                                 //formatter.setTimeZone(TimeZone.getTimeZone("GMT+0300"));
                                 //startdate = formatter.format("Yesterday at "+date);
 
 
-
-                            }else{
+                            } else {
                                 startdate = n.select(".DateTime").first().text();
                             }
-                        }else{
+                        } else {
                             startdate = n.select(".DateTime").first().text();
+                        }
+                        int pages = 1;
+                        if(n.select(".itemPageNav").first() != null){
+                            pages = Integer.parseInt(n.select(".itemPageNav").first().children().last().text());
                         }
 
                         String lastreplyname = n.select(".lastPostInfo").select("a").first().text();
@@ -313,8 +316,10 @@ if(nsv !=null)
                         int views = Integer.parseInt(n.select(".stats").select("dd").last().text().replace(",", ""));
                         boolean isread = n.select(".unreadLink").first() == null;
                         boolean isticky = n.select(".sticky").first() != null;
-                        Simplethread st = new Simplethread(ID, title, maker, latestreplydate, startdate, lastreplyname, makeravatarn, replies, views, isread, isticky);
 
+                        Simpleuser su = new Simpleuser(makerid,maker,makeravatarn);
+                        Simplethread st = new Simplethread(ID, title, su, latestreplydate, startdate, lastreplyname, makeravatarn, replies, views, isread, isticky);
+                        st.setPages(pages);
 
                         threadarray.add(st);
 
@@ -328,7 +333,7 @@ if(nsv !=null)
                     Elements sfchilds = document.select(".nodeList").first().children();
 
 
-                    ArrayList<Forum> myforums = new ArrayList<>();
+                    ArrayList<Object> myforums = new ArrayList<>();
                     for (Element ch : sfchilds) {
                         int cid = 0;
                         String ctitle = ch.select(".nodeTitle").first().text();
@@ -369,13 +374,13 @@ if(nsv !=null)
                         }
                     }
 
-                    if (threadarray.size() == 0)  {
+                    if (threadarray.size() == 0) {
 
 
                     } else {
                         threadslist.addAll(threadarray);
-                        if(page < totalpages)
-                        threadslist.add(null);
+                        if (page < totalpages)
+                            threadslist.add(null);
                     }
                 } else {
                     stage = 0;
@@ -417,7 +422,8 @@ if(nsv !=null)
                 Simplethread item = (Simplethread) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, ""+item.getID());
+                    arguments.putString(ThreadDetailFragment.ARG_ITEM_ID, "" + item.getID());
+                    arguments.putString("pages", "" + item.getPages());
                     ThreadDetailFragment fragment = new ThreadDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -426,7 +432,8 @@ if(nsv !=null)
                 } else {
                     Context context = view.getContext();
                     Intent intent = new Intent(context, ThreadDetailActivity.class);
-                    intent.putExtra(ThreadDetailFragment.ARG_ITEM_ID, ""+item.getID());
+                    intent.putExtra(ThreadDetailFragment.ARG_ITEM_ID, "" + item.getID());
+                    intent.putExtra("pages",""+item.getPages());
 
                     context.startActivity(intent);
                 }
@@ -463,7 +470,7 @@ if(nsv !=null)
         }
 
         @Override
-        public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+        public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
 
             if (holder instanceof ViewHolder) {
                 ViewHolder myholder = (ViewHolder) holder;
@@ -473,14 +480,24 @@ if(nsv !=null)
                     //Log.d("isread", mValues.get(position).getTitle() + " True");
                 } else {
                     myholder.title.setTextColor(ContextCompat.getColor(mParentActivity, R.color.colorAccent));
-                  //  Log.d("isread", mValues.get(position).getTitle() + " False");
+                    //  Log.d("isread", mValues.get(position).getTitle() + " False");
                 }
 
-                myholder.author.setText(mValues.get(position).getMaker());
+                myholder.author.setText(mValues.get(position).getMaker().getName());
                 myholder.replies.setText("" + mValues.get(position).getReplies());
                 myholder.views.setText("" + mValues.get(position).getViews());
-                myholder.itemView.setTag(mValues.get(position));
-                myholder.itemView.setOnClickListener(mOnClickListener);
+                myholder.threadcard.setTag(mValues.get(position));
+                myholder.threadcard.setOnClickListener(mOnClickListener);
+                myholder.userframe.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent intent = new Intent(mParentActivity, ProfileActivity.class);
+                        intent.putExtra("userid", ""+mValues.get(position).getMaker().getId());
+                        intent.putExtra("username", ""+mValues.get(position).getMaker().getName());
+                        mParentActivity.startActivity(intent);
+                    }
+                });
 
 
                 myholder.date.setText(mValues.get(position).getStartdate());
@@ -519,6 +536,8 @@ if(nsv !=null)
             final ImageView avatar;
             final ImageView like;
             final ImageView sticky;
+            final View threadcard;
+            final View userframe;
 
             ViewHolder(View view) {
                 super(view);
@@ -531,6 +550,8 @@ if(nsv !=null)
                 avatar = view.findViewById(R.id.avatarph);
                 like = view.findViewById(R.id.likeph);
                 sticky = view.findViewById(R.id.sticky);
+                threadcard = view.findViewById(R.id.threadcard);
+                userframe = view.findViewById(R.id.user_frame);
             }
         }
 
@@ -549,8 +570,8 @@ if(nsv !=null)
     @Override
     protected void onResume() {
         super.onResume();
-        if(mShimmerViewContainer !=null)
-        mShimmerViewContainer.startShimmerAnimation();
+        if (mShimmerViewContainer != null)
+            mShimmerViewContainer.startShimmerAnimation();
     }
 
     @Override
