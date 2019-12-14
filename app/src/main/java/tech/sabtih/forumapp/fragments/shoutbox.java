@@ -182,7 +182,7 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
             }
         });
         rv = v.findViewById(R.id.messages_view);
-        startRepeatingTask();
+        //startRepeatingTask();
         sending = v.findViewById(R.id.sending);
         msgbox = v.findViewById(R.id.msgfield);
         msgbox.setTextColor(spchat.getInt("chatcolor", 0xFF000000));
@@ -225,6 +225,7 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
         @Override
         public void run() {
             try {
+                Log.d("shoutbox","Getting messages");
                 getMessages(); //this function can change value of mInterval.
             } finally {
                 // 100% guarantee that this always happens, even if
@@ -315,12 +316,17 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
 
         Request request = new Request.Builder()
                 .url("http://" + getString(R.string.url) + "/taigachat/list.json")
+                .header("Referer","http://itsjerryandharry.com/forums/")
+                .header("X-Ajax-Referer","http://itsjerryandharry.com/forums/")
+                .header("X-Requested-With","XMLHttpRequest")
+                .header("Content-Type","application/x-www-form-urlencoded; charset=UTF-8").header("Accept","application/json, text/javascript, */*; q=0.01")
                 .post(new FormBody.Builder()
                         .add("_xfToken", sharedPreferences.getString("_xfToken", ""))
                         .add("_xfResponseType", "json")
                         .add("room", "1")
                         .add("sidebar", "0")
                         .add("_xfNoRedirect", "1")
+                        .add("_xfRequestUri", "/forums/")
                         .add("lastrefresh", "" + lastupdate)
                         .build())
                 .build();
@@ -341,6 +347,7 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
                 try {
                     JSONObject json = new JSONObject(myResponse);
                     Document doc = Jsoup.parse(json.getString("templateHtml"));
+                    if(json.has("lastrefresh"))
                     lastupdate = json.getInt("lastrefresh");
                     if (!sharedPreferences.getString("xf_user", "").isEmpty() && mListener != null) {
                         int alerts = json.getInt("_visitor_alertsUnread");
@@ -603,6 +610,8 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
     }
 
     void stopRepeatingTask() {
+
+
         mHandler.removeCallbacks(mStatusChecker);
     }
 
@@ -622,6 +631,18 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
         super.onDetach();
         mListener = null;
         stopRepeatingTask();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopRepeatingTask();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startRepeatingTask();
     }
 
     @Override

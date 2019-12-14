@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableTop="@mipmap/ic_launcher"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+        <Switch
+            android:id="@+id/isCacheEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/listPreferredItemHeight"
+            android:drawablePadding="16dp"
+            android:text="@string/is_cache_enabled" />
+
+        <Switch
+            android:id="@+id/isImmersiveEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/listPreferredItemHeight"
+            android:drawablePadding="16dp"
+            android:text="@string/is_immersive_enabled" />
+
+        <Switch
+            android:id="@+id/isTextEnabled"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/listPreferredItemHeight"
+            android:drawablePadding="16dp"
+            android:text="@string/is_text_progress_enabled" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="?attr/listPreferredItemHeightSmall"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="@string/story_duration" />
+
+        <SeekBar
+            android:id="@+id/seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/listPreferredItemHeightSmall"
+            android:max="10"
+            android:padding="16dp"
+            android:progress="3" />
+
+        <Button
+            android:id="@+id/storyTime"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/listPreferredItemHeightLarge"
+            android:layout_gravity="center"
+            android:text="@string/once_upon_a_time"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+
+</RelativeLayout>

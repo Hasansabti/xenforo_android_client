@@ -199,6 +199,20 @@
                         android:text="-"
                         app:layout_constraintStart_toEndOf="@+id/lastseenlbl"
                         app:layout_constraintTop_toBottomOf="@+id/lastseendevider" />
+
+                    <TextView
+                        android:id="@+id/textView10"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:background="@drawable/banner"
+                        android:backgroundTint="#FFAA00"
+                        android:backgroundTintMode="multiply"
+                        android:text="Donator"
+                        android:textColor="#FFFFFF"
+                        app:layout_constraintBottom_toTopOf="@+id/custitle"
+                        app:layout_constraintStart_toEndOf="@+id/username"
+                        app:layout_constraintTop_toTopOf="@+id/username" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.cardview.widget.CardView>

@@ -83,7 +83,7 @@ public class MyChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             holder.msg.setText(Html.fromHtml(holder.mItem.getMsg(), Html.FROM_HTML_MODE_COMPACT));
         } else {
-            holder.msg.setText(Html.fromHtml(holder.mItem.getMsg()));
+            holder.msg.setText(Html.fromHtml(holder.mItem.getMsg(), new PicassoImageGetter(holder.msg,((shoutbox)mListener).getResources(),Picasso.get(),true), null));
         }
 
         Date date = new Date((Long.parseLong( holder.mItem.getDate())*1000));
@@ -130,7 +130,7 @@ public class MyChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         } else {
          */
   holder.msg.setMovementMethod(LinkMovementMethod.getInstance());
-  holder.msg.setText(Html.fromHtml(holder.mItem.getMsg(), new PicassoImageGetter(holder.msg,((shoutbox)mListener).getResources(),Picasso.get()), null));
+  holder.msg.setText(Html.fromHtml(holder.mItem.getMsg(), new PicassoImageGetter(holder.msg,((shoutbox)mListener).getResources(),Picasso.get(),true), null));
 
        // }
 

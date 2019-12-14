@@ -69,7 +69,8 @@ public class NewsFragment extends Fragment {
             try {
                 ArrayList<Newsitem> newsl = new ArrayList<>();
                 //Connect to the website
-                Document document = Jsoup.connect("http://"+getString(R.string.url)+"/articles/?page="+args[0]).data("xf_session",sharedPref.getString("xf_session","")).cookie("xf_session",sharedPref.getString("xf_session","")).cookie("xf_user",sharedPref.getString("xf_user","")).get();
+                Document document = Jsoup.connect("http://"+getString(R.string.url)+"/articles/?page="+args[0]).data("xf_session",sharedPref.getString("xf_session","")).cookie("xf_session",sharedPref.getString("xf_session","")).cookie("xf_user",sharedPref.getString("xf_user",""))
+                        .get();
                 Element news= document.select("#recentNews").first();
 
 

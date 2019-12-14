@@ -188,10 +188,10 @@ getPPRepliies(""+pp.getId(),view);
                     ArrayList<Profilepostmessage> reps = null;
                     JSONObject json = new JSONObject(myResponse);
                     Document doc = Jsoup.parse(StringEscapeUtils.unescapeJson( json.getString("comments").replace("[","").replace("]","")));
-
-                    int alerts = json.getInt("_visitor_alertsUnread");
-                    int inbox = json.getInt("_visitor_conversationsUnread");
-
+                    if (!sharedPreferences.getString("xf_user", "").isEmpty()) {
+                        int alerts = json.getInt("_visitor_alertsUnread");
+                        int inbox = json.getInt("_visitor_conversationsUnread");
+                    }
                     for(Element ppr : doc.body().select("li")){
 
                         if(ppr.hasClass("comment") && !ppr.attr("id").contains("Submit")){

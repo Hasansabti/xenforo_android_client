@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
+import android.text.Html;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
@@ -34,6 +36,7 @@ import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
 import tech.sabtih.forumapp.listeners.OnTReplyInteractionListener;
 import tech.sabtih.forumapp.models.Threadreply;
 import tech.sabtih.forumapp.utils.MyWebViewClient;
+import tech.sabtih.forumapp.utils.PicassoImageGetter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,16 +52,17 @@ public class MyThreadreplyRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 
     private List<Threadreply> mValues;
     private final OnTReplyInteractionListener mListener;
-    RecyclerView.Adapter repliesadapter;
+    //RecyclerView.Adapter repliesadapter;
     String script;
     Boolean nested = false;
+    int depth = 0;
 
 
 
     // for load more
     private final int VIEW_TYPE_ITEM = 0;
     private final int VIEW_TYPE_LOADING = 1;
-    public MyThreadreplyRecyclerViewAdapter(List<Threadreply> items, OnTReplyInteractionListener listener, boolean nested) {
+    public MyThreadreplyRecyclerViewAdapter(List<Threadreply> items, OnTReplyInteractionListener listener, boolean nested, int depth) {
         mValues = items;
         mListener = listener;
         this.nested = nested;
@@ -113,10 +117,27 @@ public class MyThreadreplyRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 
             holder.author.setText(holder.mItem.getSu().getName());
             holder.date.setText(holder.mItem.getDate());
-            holder.content.setWebViewClient(new MyWebViewClient(((ThreadDetailFragment) mListener).getActivity()));
-            holder.content.getSettings().setJavaScriptEnabled(true);
+
             // holder.content.loadData(holder.mItem.getText(), "text/html; charset=utf-8", "UTF-8");
-            holder.content.loadHtml(holder.mItem.getText(), "http://" + ((ThreadDetailFragment) mListener).getString(R.string.url));
+            //Log.d("Reply",holder.mItem.getText());
+            if(holder.mItem.getText().contains("bbCodeSpoilerButton") || holder.mItem.getText().contains("bbCodeQuote")){
+                holder.content.setWebViewClient(new MyWebViewClient(((ThreadDetailFragment) mListener).getActivity()));
+                holder.content.getSettings().setJavaScriptEnabled(true);
+                holder.content.setVisibility(View.VISIBLE);
+                holder.plaincontent.setVisibility(View.GONE);
+                holder.content.loadHtml(holder.mItem.getText(), "http://" + ((ThreadDetailFragment) mListener).getString(R.string.url));
+
+            }else{
+                holder.content.setVisibility(View.GONE);
+                holder.plaincontent.setVisibility(View.VISIBLE);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    holder.plaincontent.setText(Html.fromHtml(holder.mItem.getText(), new PicassoImageGetter(holder.plaincontent,((ThreadDetailFragment)mListener).getResources(),Picasso.get(),false), null));
+                } else {
+                    holder.plaincontent.setText(Html.fromHtml(holder.mItem.getText(), new PicassoImageGetter(holder.plaincontent,((ThreadDetailFragment)mListener).getResources(),Picasso.get(),false), null));
+                }
+            }
+
             holder.likes.setText("" + holder.mItem.getLikes());
             holder.Report.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -152,29 +173,51 @@ public class MyThreadreplyRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
             });
 
             Picasso.get().load("http://" + ((ThreadDetailFragment) mListener).getActivity().getString(R.string.url) + "/" + holder.mItem.getSu().getAvatar()).into(holder.avatar);
+            holder.replies.setHasFixedSize(true);
 
-            if (mValues.get(position).getReplies() != null) {
-                repliesadapter = new MyThreadreplyRecyclerViewAdapter(mValues.get(position).getReplies(), mListener, true);
-
+            if (mValues.get(position).getReplies() != null && mValues.get(position).getReplies().size() > 0 && depth < 5) {
+                MyThreadreplyRecyclerViewAdapter repliesadapter = new MyThreadreplyRecyclerViewAdapter(mValues.get(position).getReplies(), mListener, true,depth+1);
+                repliesadapter.setHasStableIds(true);
+                Log.d("repliescount",""+mValues.get(position).getReplies().size());
+                Log.d("replies","Adding replies");
                 //repliesadapter = new ThreadReplyReplyAdapter(mValues.get(position).getReplies(),mListener);
                 holder.replies.setLayoutManager(new LinearLayoutManager(holder.replies.getContext()));
                 holder.replies.setAdapter(repliesadapter);
 
                 //  Log.d("nestedreply",mValues.get(position).getPostid() + " has reples "+mValues.get(position).getReplies().size());
                 holder.commentline.setVisibility(View.VISIBLE);
+                repliesadapter.notifyDataSetChanged();
 
             } else {
+               // holder.replies.setLayoutManager(new LinearLayoutManager(holder.replies.getContext()));
+               // repliesadapter = null;
+                //holder.replies = null;
                 holder.commentline.setVisibility(View.GONE);
             }
             if (nested) {
                 holder.cv.setCardElevation(0);
             }
+
+            holder.userholder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.viewUser(holder.mItem.getSu());
+                }
+            });
         } else if (tholder instanceof ViewHolderLoading) {
             ViewHolderLoading loadingViewHolder = (ViewHolderLoading) tholder;
             loadingViewHolder.progressBar.setIndeterminate(true);
 
         }
 
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if(mValues.get(position) != null)
+        return mValues.get(position).getId();
+        else
+            return 0;
     }
 
     @Override
@@ -197,6 +240,8 @@ public class MyThreadreplyRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
         TextView author;
         CardView cv;
 
+        View userholder;
+
 
         TextView date;
         TextView likes;
@@ -205,6 +250,7 @@ public class MyThreadreplyRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
         ImageView like;
         RecyclerView replies;
         AdvancedWebView content;
+        TextView plaincontent;
         View commentline;
 
 
@@ -214,6 +260,9 @@ public class MyThreadreplyRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
 
             avatar = mView.findViewById(R.id.avatarph);
             cv = mView.findViewById(R.id.thrdcntnt);
+            plaincontent = view.findViewById(R.id.plaintext);
+
+            userholder = view.findViewById(R.id.userholder);
 
 
             author = mView.findViewById(R.id.tauthorph);

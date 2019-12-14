@@ -207,7 +207,11 @@ public class AccountFragment extends Fragment {
             try {
                 ArrayList<Newsitem> newsl = new ArrayList<>();
                 //Connect to the website
-                Document document = Jsoup.connect("http://"+getString(R.string.url)+"/members/"+args[0]).cookie("xf_session",sharedPreferences.getString("xf_session","")).cookie("xf_user",sharedPreferences.getString("xf_user","")).get();
+                Document document = Jsoup.connect("http://"+getString(R.string.url)+"/members/"+args[0])                .header("Referer","http://itsjerryandharry.com/members/"+args[0])
+                        .header("X-Ajax-Referer","http://itsjerryandharry.com/members/"+args[0])
+                        .header("X-Requested-With","XMLHttpRequest")
+                        .header("Content-Type","application/x-www-form-urlencoded; charset=UTF-8").header("Accept","application/json, text/javascript, */*; q=0.01")
+                        .cookie("xf_session",sharedPreferences.getString("xf_session","")).cookie("xf_user",sharedPreferences.getString("xf_user","")).get();
                 String status = "";
                 int id = Integer.parseInt( args[0]);
                 String username = document.select(".username").first().text();

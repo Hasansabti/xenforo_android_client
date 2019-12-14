@@ -73,7 +73,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
     private ShimmerFrameLayout mShimmerViewContainer;
     SimpleItemRecyclerViewAdapter threadsadapter;
     public ArrayList<Object> subforums = new ArrayList<>();
-    public ArrayList<Simplethread> threadslist = new ArrayList<>();
+    public ArrayList<Object> threadslist = new ArrayList<>();
     boolean isRecyclerViewWaitingtoLaadData = false;
     boolean loadedAllItems = false;
     boolean multipage = false;
@@ -238,7 +238,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
             int stage = 0;
 
             try {
-                ArrayList<Simplethread> threadarray = new ArrayList<>();
+                ArrayList<Object> threadarray = new ArrayList<>();
 
 
                 //Connect to the website
@@ -408,13 +408,14 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-        private final ThreadListActivity mParentActivity;
-        private List<Simplethread> mValues;
+        private final AppCompatActivity mParentActivity;
+        private List<Object> mValues;
         private final boolean mTwoPane;
 
         // for load more
         private final int VIEW_TYPE_ITEM = 0;
         private final int VIEW_TYPE_LOADING = 1;
+        private final int VIEW_TYPE_NOTE = 2;
 
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
@@ -440,9 +441,9 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
             }
         };
 
-        SimpleItemRecyclerViewAdapter(ThreadListActivity parent,
-                                      List<Simplethread> items,
-                                      boolean twoPane) {
+        public SimpleItemRecyclerViewAdapter(AppCompatActivity parent,
+                                             ArrayList<Object> items,
+                                             boolean twoPane) {
             mValues = items;
             mParentActivity = parent;
             mTwoPane = twoPane;
@@ -458,6 +459,10 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                 View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_progressbar, parent, false);
                 return new ViewHolderLoading(view);
             }
+            else if (viewType == VIEW_TYPE_NOTE) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.text_holder, parent, false);
+                return new ViewHolderText(view);
+            }
             return null;
 
 
@@ -466,16 +471,17 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
 
         @Override
         public int getItemViewType(int position) {
-            return mValues.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
+            return mValues.get(position) == null ? VIEW_TYPE_LOADING : (mValues.get(position) instanceof String ? VIEW_TYPE_NOTE : VIEW_TYPE_ITEM);
         }
 
         @Override
         public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
 
-            if (holder instanceof ViewHolder) {
-                ViewHolder myholder = (ViewHolder) holder;
-                myholder.title.setText(mValues.get(position).getTitle());
-                if (mValues.get(position).isIsread()) {
+            if (holder instanceof ViewHolder && mValues.get(position) instanceof Simplethread) {
+                final ViewHolder myholder = (ViewHolder) holder;
+                myholder.mitem = (Simplethread) mValues.get(position);
+                myholder.title.setText(myholder.mitem.getTitle());
+                if (myholder.mitem.isIsread()) {
                     myholder.title.setTextColor(Color.GRAY);
                     //Log.d("isread", mValues.get(position).getTitle() + " True");
                 } else {
@@ -483,9 +489,9 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                     //  Log.d("isread", mValues.get(position).getTitle() + " False");
                 }
 
-                myholder.author.setText(mValues.get(position).getMaker().getName());
-                myholder.replies.setText("" + mValues.get(position).getReplies());
-                myholder.views.setText("" + mValues.get(position).getViews());
+                myholder.author.setText(myholder.mitem.getMaker().getName());
+                myholder.replies.setText("" + myholder.mitem.getReplies());
+                myholder.views.setText("" + myholder.mitem.getViews());
                 myholder.threadcard.setTag(mValues.get(position));
                 myholder.threadcard.setOnClickListener(mOnClickListener);
                 myholder.userframe.setOnClickListener(new View.OnClickListener() {
@@ -493,25 +499,31 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                     public void onClick(View view) {
 
                         Intent intent = new Intent(mParentActivity, ProfileActivity.class);
-                        intent.putExtra("userid", ""+mValues.get(position).getMaker().getId());
-                        intent.putExtra("username", ""+mValues.get(position).getMaker().getName());
+                        intent.putExtra("userid", ""+myholder.mitem.getMaker().getId());
+                        intent.putExtra("username", ""+myholder.mitem.getMaker().getName());
                         mParentActivity.startActivity(intent);
                     }
                 });
 
 
-                myholder.date.setText(mValues.get(position).getStartdate());
-                if (mValues.get(position).isSticky()) {
+                myholder.date.setText(myholder.mitem.getStartdate());
+                if (myholder.mitem.isSticky()) {
                     myholder.sticky.setVisibility(View.VISIBLE);
 
                 } else {
                     myholder.sticky.setVisibility(View.GONE);
                 }
-                Picasso.get().load("http://" + mParentActivity.getString(R.string.url) + "/" + mValues.get(position).getMakeravatar()).into(myholder.avatar);
+                Picasso.get().load("http://" + mParentActivity.getString(R.string.url) + "/" + myholder.mitem.getMakeravatar()).into(myholder.avatar);
                 //Log.d("Avatar","http://"+ mParentActivity.getString(R.string.url)+"/"+mValues.get(position).getMakeravatar());
             } else if (holder instanceof ViewHolderLoading) {
                 ViewHolderLoading loadingViewHolder = (ViewHolderLoading) holder;
                 loadingViewHolder.progressBar.setIndeterminate(true);
+
+            }else if (holder instanceof ViewHolderText) {
+                String note = (String) mValues.get(position);
+                ViewHolderText noteholder = (ViewHolderText) holder;
+                noteholder.textview.setText(note);
+
 
             }
         }
@@ -522,7 +534,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
             return mValues.size();
         }
 
-        public void setList(ArrayList<Simplethread> threadslist) {
+        public void setList(ArrayList<Object> threadslist) {
             this.mValues = threadslist;
         }
 
@@ -538,6 +550,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
             final ImageView sticky;
             final View threadcard;
             final View userframe;
+            public Simplethread mitem;
 
             ViewHolder(View view) {
                 super(view);
@@ -562,6 +575,15 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
             public ViewHolderLoading(View view) {
                 super(view);
                 progressBar = (ProgressBar) view.findViewById(R.id.itemProgressbar);
+            }
+        }
+
+        public class ViewHolderText extends RecyclerView.ViewHolder {
+            public TextView textview;
+
+            public ViewHolderText(View view) {
+                super(view);
+                textview =  view.findViewById(R.id.mytextholder);
             }
         }
     }

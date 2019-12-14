@@ -7,6 +7,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -18,11 +19,13 @@ public class PicassoImageGetter implements Html.ImageGetter {
     final Picasso pablo;
 
     final TextView textView;
+    private final boolean chat;
 
-    public PicassoImageGetter(final TextView textView, final Resources resources, final Picasso pablo) {
+    public PicassoImageGetter(final TextView textView, final Resources resources, final Picasso pablo, boolean chat) {
         this.textView  = textView;
         this.resources = resources;
         this.pablo     = pablo;
+        this.chat = chat;
     }
 
     @Override public Drawable getDrawable(final String source) {
@@ -33,7 +36,12 @@ public class PicassoImageGetter implements Html.ImageGetter {
             @Override
             protected Bitmap doInBackground(final Void... meh) {
                 try {
+                    Log.d("Loading image",source);
+
+                    if(chat)
                     return pablo.load(source).resize(50,50).get();
+                    else
+                        return pablo.load(source).get();
                 } catch (Exception e) {
                     return null;
                 }

@@ -1,6 +1,9 @@
 package tech.sabtih.forumapp.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,6 +27,8 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import tech.sabtih.forumapp.Login;
+import tech.sabtih.forumapp.ProfileActivity;
 import tech.sabtih.forumapp.R;
 import tech.sabtih.forumapp.adapters.MyAlertRecyclerViewAdapter;
 import tech.sabtih.forumapp.adapters.MyForumsRecyclerViewAdapter;
@@ -127,10 +133,11 @@ public class AlertFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Object> alrts) {
             super.onPostExecute(alrts);
-            MyAlertRecyclerViewAdapter adapter = new MyAlertRecyclerViewAdapter(alrts,mListener);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            recyclerView.setAdapter(adapter);
-
+            if(alrts != null) {
+                MyAlertRecyclerViewAdapter adapter = new MyAlertRecyclerViewAdapter(alrts, mListener);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+                recyclerView.setAdapter(adapter);
+            }
 
             //
 
@@ -182,6 +189,9 @@ public class AlertFragment extends Fragment {
                         }
 
 
+
+
+
                     }
 
 
@@ -189,6 +199,35 @@ public class AlertFragment extends Fragment {
 
                 return alerts;
 
+
+            }catch (final HttpStatusException e) {
+                e.printStackTrace();
+                if (e.getStatusCode() == 403) {
+                    Log.d("Alert_Error",e.toString());
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            final Intent intent = new Intent(getActivity(), Login.class);
+                            intent.putExtra("type", "login");
+                            AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+                            alertDialog.setTitle("Error");
+                            alertDialog.setMessage("You must be logged in to do that.");
+                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            getActivity(). finish();
+                                            startActivity(intent);
+                                        }
+                                    });
+                            alertDialog.show();
+
+                        }
+                    });
+                    return null;
+
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();

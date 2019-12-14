@@ -132,7 +132,7 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
             //    mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
 //
             if (getArguments().getString("pages") != null)
-                page = Integer.parseInt(getArguments().getString("pages"));
+                page = Integer.parseInt(getArguments().getString("pages").trim());
             if (getArguments().get("pages") != null) {
                 totalpages = Integer.parseInt(getArguments().getString("pages").trim());
             } else {
@@ -140,7 +140,10 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
             }
         }
 
+        Log.d("Loading page",""+page);
+
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -175,14 +178,14 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
 
         url = getArguments().getString(ARG_ITEM_ID);
 
-
-        if(!url.contains("posts")) {
+        if(url != null )
+        if( !url.contains("posts")) {
             url = "/threads/" + url + "/";
         }else{
             url = "/"+url;
         }
         if (url == null && getArguments().getString("url") != null) {
-            url = getArguments().getString("url").replace("/threads/", "").split("\\.")[1].replace("/", "")+"/";
+            url = "/threads/"+getArguments().getString("url").replace("/threads/", "").split("\\.")[1].replace("/", "")+"/";
             Log.d("thread_url", "Opening url id: " + url);
         }
 
@@ -264,6 +267,16 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
 
     }
 
+    @Override
+    public void viewUser(Simpleuser su) {
+
+            Intent intent = new Intent(getActivity(), ProfileActivity.class);
+            intent.putExtra("userid", "" + su.getId());
+            intent.putExtra("username", su.getName());
+            startActivity(intent);
+
+    }
+
 
     private class getThread extends AsyncTask<String, Void, Discussion> {
 
@@ -271,6 +284,7 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
         protected void onPreExecute() {
             super.onPreExecute();
             scrollocation = nsv.getScrollY();
+            Log.d("totalpages",""+totalpages);
         }
 
         @Override
@@ -317,9 +331,11 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
                 }
                 // if (page == 1)
                 //   discussion.getTreplies().remove(0);
+                threadreplies.setHasFixedSize(true);
                 if (adapter == null) {
                     // Collections.reverse(discussion.getTreplies());
-                    adapter = new MyThreadreplyRecyclerViewAdapter(discussion.getTreplies(), ThreadDetailFragment.this, false);
+                    adapter = new MyThreadreplyRecyclerViewAdapter(discussion.getTreplies(), ThreadDetailFragment.this, false,0);
+                    adapter.setHasStableIds(true);
                     LinearLayoutManager llm = new LinearLayoutManager(threadreplies.getContext());
                     // llm.setStackFromEnd(true);
                     // llm.setReverseLayout(true);
@@ -330,6 +346,7 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
                 } else {
                     adapter.setValues(repliesarr);
                     adapter.notifyDataSetChanged();
+
                 }
 
 
@@ -422,6 +439,7 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
 
 
                 } else {
+                    if(mymainpost == null)
                     mymainpost = parseTR(thread.children().get(0), document, repliesarr);
 
                 }
@@ -623,10 +641,10 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
                 Threadreply thr1;
                 if (r != null) {
                     if (r.getPostid().equalsIgnoreCase(repid)) {
-                        Log.d("rec", "Found reply " + r.getPostid());
+                       // Log.d("rec", "Found reply " + r.getPostid());
                         thr1 = r;
                     } else {
-                        Log.d("serch", "Searching for " + repid + " in " + r.getPostid());
+                       // Log.d("serch", "Searching for " + repid + " in " + r.getPostid());
                         thr1 = checkreplies(r.getReplies(), repid);
                     }
                     if (thr1 != null) {
@@ -637,7 +655,7 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
                 }
             }
 
-            Log.d("serch", "Reply " + repid + " not found ");
+          //  Log.d("serch", "Reply " + repid + " not found ");
         }
 
         return null;

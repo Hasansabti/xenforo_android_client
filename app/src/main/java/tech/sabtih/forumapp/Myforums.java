@@ -1,11 +1,13 @@
 package tech.sabtih.forumapp;
 
 import android.app.Activity;
-import android.content.Context;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -14,83 +16,101 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import android.transition.AutoTransition;
-import android.transition.ChangeBounds;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AnticipateInterpolator;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import tech.sabtih.forumapp.adapters.ViewPagerAdapter;
+import tech.sabtih.forumapp.dummy.DummyContent;
 import tech.sabtih.forumapp.fragments.AccountFragment;
+import tech.sabtih.forumapp.fragments.FeedFragment;
 import tech.sabtih.forumapp.fragments.ForumCategoryFragment;
 import tech.sabtih.forumapp.fragments.NewsFragment;
 import tech.sabtih.forumapp.fragments.shoutbox;
 import tech.sabtih.forumapp.listeners.OnAlertsupdatedListener;
 import tech.sabtih.forumapp.listeners.OnForumsListInteractionListener;
 import tech.sabtih.forumapp.listeners.OnListFragmentInteractionListener;
+import tech.sabtih.forumapp.models.Discussion;
 import tech.sabtih.forumapp.models.Forum;
-import tech.sabtih.forumapp.models.Forumcategory;
 import tech.sabtih.forumapp.models.Newsitem;
 
-public class Myforums extends AppCompatActivity implements OnListFragmentInteractionListener, NewsFragment.OnNewsListFragmentInteractionListener, AccountFragment.OnFragmentInteractionListener, OnForumsListInteractionListener, shoutbox.OnFragmentInteractionListener, OnAlertsupdatedListener {
+public class Myforums extends AppCompatActivity implements OnListFragmentInteractionListener, FeedFragment.OnListFeedInteractionListener, NewsFragment.OnNewsListFragmentInteractionListener, AccountFragment.OnFragmentInteractionListener, OnForumsListInteractionListener, shoutbox.OnFragmentInteractionListener, OnAlertsupdatedListener {
 
 
     private NewsFragment news;
+    private FeedFragment feeds;
     public AccountFragment account;
     public ForumCategoryFragment fcat;
     public shoutbox chat;
+
     ViewPager viewPager;
     MenuItem prevMenuItem;
     BottomNavigationView navView;
     ViewPagerAdapter viewPagerAdapter;
     ConstraintLayout constraintLayout;
 
+    RelativeLayout alertscont;
+    RelativeLayout inboxcont;
+
+    Button btnalerts;
+    Button btninbox;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment fragment = null;
+
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     // mTextMessage.setText(R.string.title_home);
                     viewPager.setCurrentItem(0);
                     //   return true;
                     break;
+
+                case R.id.navigation_feed:
+                    viewPager.setCurrentItem(1);
+
+                    break;
                 case R.id.navigation_dashboard:
                     //   mTextMessage.setText(R.string.title_dashboard);
-                    viewPager.setCurrentItem(1);
-                    fragment = fcat;
+                    viewPager.setCurrentItem(2);
+                   // fragment = fcat;
                     break;
                 // return true;
                 case R.id.navigation_chat:
                     //  mTextMessage.setText(R.string.title_notifications);
                     //   return true;
 
-                    viewPager.setCurrentItem(2);
+                    viewPager.setCurrentItem(3);
                     //shownavbar(true);
                     break;
                 case R.id.navigation_notifications:
                     //  mTextMessage.setText(R.string.title_notifications);
                     //   return true;
-                    viewPager.setCurrentItem(3);
+                    viewPager.setCurrentItem(4);
                     break;
             }
-            if (fragment != null) {
 
-                return true;
-            }
-            return false;
+            return true;
         }
     };
 
@@ -98,10 +118,16 @@ public class Myforums extends AppCompatActivity implements OnListFragmentInterac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myforums);
+        createNotificationChannel();
         constraintLayout = findViewById(R.id.container);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setOffscreenPageLimit(4);
 
+
+
+           // getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+            //viewPager.setPadding(0,330,0,0);
 
 
         navView = findViewById(R.id.nav_view);
@@ -111,15 +137,17 @@ public class Myforums extends AppCompatActivity implements OnListFragmentInterac
                 //  System.out.println("scroll changed");
                 // Log.d("Scrolling",""+positionOffset +" mapped " + ((int)(positionOffset*240) ));
                 if (position == 0)
-                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(240, 230 + ((int) (positionOffset * 10)), 200, 200)));
+                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(200, 230 + ((int) (positionOffset * 10)), 200, 200)));
                 if (position == 1)
-                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(240, 240, 200 - ((int) (positionOffset * 20)), 200)));
+                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(200, 240, 200 - ((int) (positionOffset * 20)), 200)));
                 if (position == 2)
-                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(240, 240, 180, 200 - ((int) (positionOffset * 20)))));
+                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(200, 240, 180, 200 - ((int) (positionOffset * 20)))));
                 if (position == 3)
-                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(240, 240, 180, 180)));
+                    getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.argb(200, 240, 180, 180)));
 
             }
+
+
 
             @Override
             public void onPageSelected(int position) {
@@ -167,6 +195,11 @@ public class Myforums extends AppCompatActivity implements OnListFragmentInterac
             viewPagerAdapter.addFragment(news);
         }
 
+        if (feeds == null) {
+            feeds = new FeedFragment();
+            viewPagerAdapter.addFragment(feeds);
+        }
+
         if (fcat == null) {
             fcat = new ForumCategoryFragment();
             viewPagerAdapter.addFragment(fcat);
@@ -200,6 +233,7 @@ public class Myforums extends AppCompatActivity implements OnListFragmentInterac
     @Override
     public void onNewsScrolled(int dy) {
 
+
         if (dy > 0 && navView.isShown()) {
             if (up == false) {
                 up = true;
@@ -227,6 +261,33 @@ public class Myforums extends AppCompatActivity implements OnListFragmentInterac
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater mi = getMenuInflater();
         mi.inflate(R.menu.main_menu,menu);
+        MenuItem alrtitem = menu.findItem(R.id.alerts);
+        MenuItem inboxitem = menu.findItem(R.id.inbox);
+
+        MenuItemCompat.setActionView(alrtitem,R.layout.alerts_button);
+        MenuItemCompat.setActionView(inboxitem,R.layout.inbox_button);
+        alertscont = (RelativeLayout) MenuItemCompat.getActionView(alrtitem);
+        inboxcont = (RelativeLayout) MenuItemCompat.getActionView(inboxitem);
+
+        btnalerts = alertscont.findViewById(R.id.button2);
+        btninbox = inboxcont.findViewById(R.id.button1);
+
+        btnalerts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Myforums.this, Alerts.class);
+                startActivity(intent);
+            }
+        });
+        btninbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(Myforums.this,NewStoryActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return true;
 
     }
@@ -346,7 +407,88 @@ public class Myforums extends AppCompatActivity implements OnListFragmentInterac
     }
 
     @Override
-    public void onAlertsUpdate(int alerts, int inbox) {
+    public void onAlertsUpdate(final int alerts, final int inbox) {
+
+Myforums.this.runOnUiThread(new Runnable() {
+    @Override
+    public void run() {
+        TextView numalerts = alertscont.findViewById(R.id.numalerts);
+        TextView numinbox = inboxcont.findViewById(R.id.numinbox);
+
+
+        if(alerts == 0) {
+            numalerts.setVisibility(View.INVISIBLE);
+            btnalerts.setBackground(getDrawable(R.drawable.menu_alerts));
+        }else {
+            numalerts.setVisibility(View.VISIBLE);
+            btnalerts.setBackground(getDrawable(R.drawable.menu_alerts_unread));
+
+            if(Integer.parseInt(numalerts.getText().toString().trim()) < alerts){
+                Toast.makeText(getApplicationContext(),"You have " +(alerts-Integer.parseInt(numalerts.getText().toString().trim()))+" new Alert(s)",Toast.LENGTH_SHORT).show();
+                createNotification("Alerts","You have " +(alerts-Integer.parseInt(numalerts.getText().toString().trim()))+" new Alert(s)");
+
+            }
+
+        }
+        if(inbox == 0) {
+            numinbox.setVisibility(View.INVISIBLE);
+            btninbox.setBackground(getDrawable(R.drawable.menu_chat));
+        }else {
+            numinbox.setVisibility(View.VISIBLE);
+            btninbox.setBackground(getDrawable(R.drawable.menu_chat_unread));
+            if(Integer.parseInt(numinbox.getText().toString().trim()) < inbox){
+                Toast.makeText(getApplicationContext(),"You have " +(inbox-Integer.parseInt(numinbox.getText().toString().trim()))+" new unread conversation(s)",Toast.LENGTH_SHORT).show();
+             //   createNotification("Inbox","You have " +(inbox-Integer.parseInt(numinbox.getText().toString().trim()))+" new unread conversation(s)");
+
+            }
+        }
+
+        numalerts.setText(""+alerts);
+        numinbox.setText(""+inbox);
+    }
+});
+
+
+    }
+
+    public void createNotification(String ttl,String msg){
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "ijah")
+                .setSmallIcon(R.drawable.chat_unread)
+                .setContentTitle(ttl)
+                .setContentText(msg)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                // Set the intent that will fire when the user taps the notification
+               // .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+// notificationId is a unique int for each notification that you must define
+        notificationManager.notify(8, builder.build());
+
+
+    }
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "ItsJerryandharry";
+            String description = "Test";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("ijah", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
+
+    @Override
+    public void onListFeedInteraction(Discussion item) {
 
     }
 }

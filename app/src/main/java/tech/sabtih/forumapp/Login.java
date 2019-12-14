@@ -60,7 +60,7 @@ ProgressBar pb;
             // Otherwise, the link is not for a page on my site, so launch another Activity that handles URLs
             //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             //startActivity(intent);
-
+                if(CookieManager.getInstance().getCookie(url) != null)
                 for (String s : CookieManager.getInstance().getCookie(url).split(" ")) {
                     String[] cookies = s.split("=");
                     if (!cookies[1].isEmpty()) {
@@ -158,7 +158,7 @@ ProgressBar pb;
                     @Override
                     protected Void doInBackground(Void... voids) {
                         try {
-                            Document doc = Jsoup.connect("http://"+getString(R.string.url)+"/portal").cookie("xf_session",sharedPref.getString("xf_session","")).get();
+                            Document doc = Jsoup.connect("https://"+getString(R.string.url)+"/").cookie("xf_session",sharedPref.getString("xf_session","")).get();
                                     String token = doc.getElementsByAttributeValue("name","_xfToken").first().attr("value");
 
 

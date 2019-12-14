@@ -75,7 +75,7 @@ public class MyAlertRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             holder.mItem = alert;
             Picasso.get().load("http://" + ((Alerts) mListener).getString(R.string.url) + "/" + alert.getUser().getAvatar()).into(holder.avatar);
             holder.date.setText(alert.getDate());
-            holder.username.setText(alert.getUser().getName());
+           // holder.username.setText(alert.getUser().getName());
             holder.message.setMovementMethod(LinkMovementMethod.getInstance());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -110,7 +110,7 @@ public class MyAlertRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
      //           if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                  //  mListener.onListFragmentInteraction(holder.mItem);
+                  //  mListener.onListFeedInteraction(holder.mItem);
      //           }
     //        }
     //    });
@@ -143,7 +143,7 @@ public class MyAlertRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         public final TextView mContentView;
         public Alert mItem;
 
-        final TextView username;
+       // final TextView username;
         final TextView date;
         final TextView message;
 
@@ -159,7 +159,7 @@ public class MyAlertRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             mContentView = (TextView) view.findViewById(R.id.content);
 
 
-            username = view.findViewById(R.id.msguser);
+          //  username = view.findViewById(R.id.msguser);
             date = view.findViewById(R.id.msg_date);
             message = view.findViewById(R.id.msg);
             avatar = (CircleImageView) view.findViewById(R.id.profilepic);
