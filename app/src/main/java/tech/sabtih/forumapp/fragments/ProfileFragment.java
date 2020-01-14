@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,14 +21,16 @@ import com.squareup.picasso.Picasso;
 import tech.sabtih.forumapp.ProfileActivity;
 import tech.sabtih.forumapp.adapters.MyProfilepostRecyclerViewAdapter;
 import tech.sabtih.forumapp.R;
+import tech.sabtih.forumapp.adapters.MyRanksAdapter;
 import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
 import tech.sabtih.forumapp.listeners.OnProfileInteractionListener;
 import tech.sabtih.forumapp.models.user.User;
+import tech.sabtih.forumapp.models.user.UserRank;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnProfileInteractionListener}
  * interface.
  */
 public class ProfileFragment extends Fragment {
@@ -42,8 +45,9 @@ public class ProfileFragment extends Fragment {
     TextView lastseen;
     ImageView avatar;
     RecyclerView postsrv;
-
+RecyclerView ranks;
     MyProfilepostRecyclerViewAdapter adapter;
+    MyRanksAdapter radapter;
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -94,6 +98,7 @@ public class ProfileFragment extends Fragment {
         avatar = view.findViewById(R.id.avatarph);
         postsrv = view.findViewById(R.id.profileposts);
         lastseen = view.findViewById(R.id.lastseen);
+        ranks = view.findViewById(R.id.ranks);
         setUser(user);
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -151,10 +156,18 @@ public class ProfileFragment extends Fragment {
 
 
         adapter = new MyProfilepostRecyclerViewAdapter(user.getProfileposts(), ((ProfileActivity)mListener));
+        radapter = new MyRanksAdapter(user.getRanks(), (mListener));
+
         LinearLayoutManager layout = new LinearLayoutManager(postsrv.getContext());
+        StaggeredGridLayoutManager rlayout = new StaggeredGridLayoutManager(2,1);
+
+
         //layout
         postsrv.setLayoutManager(layout);
         postsrv.setAdapter(adapter);
+
+        ranks.setLayoutManager(rlayout);
+        ranks.setAdapter(radapter);
 
 
         Log.d("Cover",getString(R.string.url)+"/"+ user.getCover());
@@ -162,8 +175,5 @@ public class ProfileFragment extends Fragment {
 
 
     }
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
-    }
+
 }

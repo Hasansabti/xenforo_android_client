@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.text.Html;
 import android.text.InputType;
@@ -113,6 +115,11 @@ public class MyThreadreplyRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
                     }
                 }
             });
+
+            if(holder.mItem.getSu().getStaff() > 0){
+                holder.author.setTextColor(Color.RED);
+                holder.author.setTypeface(null, Typeface.BOLD);
+            }
 
 
             holder.author.setText(holder.mItem.getSu().getName());

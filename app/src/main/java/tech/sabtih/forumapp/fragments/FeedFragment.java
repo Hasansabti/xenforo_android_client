@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.Console;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -56,6 +58,7 @@ public class FeedFragment extends Fragment {
     RecyclerView recyclerView;
     private ShimmerFrameLayout mShimmerViewContainer;
     TextView nothreads;
+    TextView showRecent;
     ThreadListActivity.SimpleItemRecyclerViewAdapter threadsadapter;
     public ArrayList<Object> threadslist = new ArrayList<>();
     boolean isRecyclerViewWaitingtoLaadData = false;
@@ -63,6 +66,7 @@ public class FeedFragment extends Fragment {
     boolean multipage = false;
     int totalpages = 0;
     int page = 1;
+    String newposts;
     SharedPreferences sharedPreferences;
     SwipeRefreshLayout srl;
     /**
@@ -98,6 +102,19 @@ public class FeedFragment extends Fragment {
         recyclerView = view.findViewById(R.id.thread_list);
 
         nothreads = view.findViewById(R.id.nothreads);
+        showRecent = view.findViewById(R.id.mRecentbtn);
+
+        showRecent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                srl.setRefreshing(true);
+                nothreads.setVisibility(View.GONE);
+                showRecent.setVisibility(View.GONE);
+                new getFeeds().execute("recent");
+            }
+        });
+
+
         mShimmerViewContainer = view.findViewById(R.id.shimmer_view_container);
         srl = view.findViewById(R.id.swiperefresh);
         srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -140,8 +157,30 @@ public class FeedFragment extends Fragment {
         @Override
         protected void onPostExecute(Integer stage) {
             super.onPostExecute(stage);
-            if (threadslist.size() == 0) {
+
+            if(stage == 5){
+                srl.setRefreshing(false);
+                mShimmerViewContainer.stopShimmerAnimation();
+                mShimmerViewContainer.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.GONE);
                 nothreads.setVisibility(View.VISIBLE);
+                showRecent.setVisibility(View.VISIBLE);
+
+                return;
+
+            }
+
+            if (threadslist.size() == 0) {
+
+                nothreads.setVisibility(View.VISIBLE);
+                showRecent.setVisibility(View.VISIBLE);
+
+
+
+            }else{
+                srl.setRefreshing(false);
+                nothreads.setVisibility(View.GONE);
+                showRecent.setVisibility(View.GONE);
             }
 
             if (stage == 0) {
@@ -156,9 +195,10 @@ public class FeedFragment extends Fragment {
 
                 mShimmerViewContainer.stopShimmerAnimation();
                 mShimmerViewContainer.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
             } else if (stage == 1) {
                 srl.setRefreshing(false);
-
+                recyclerView.setVisibility(View.VISIBLE);
                 threadsadapter.setList(threadslist);
                 threadsadapter.notifyDataSetChanged();
             }
@@ -171,11 +211,13 @@ public class FeedFragment extends Fragment {
 
             try {
                 ArrayList<Object> threadarray = new ArrayList<>();
-
-
+String url = "http://" + getString(R.string.url) + "/find-new/threads";
+if(urls[0].equalsIgnoreCase("recent")){
+    url = "http://" + getString(R.string.url) + "/"+newposts;
+}
                 //Connect to the website
                 Document document = null;
-                document = Jsoup.connect("http://" + getString(R.string.url) + "/find-new/threads")
+                document = Jsoup.connect(url)
                         .data("xf_session", sharedPreferences.getString("xf_session", ""))
                         .cookie("xf_session", sharedPreferences.getString("xf_session", "")).cookie("xf_user", sharedPreferences.getString("xf_user", ""))
                         .get();
@@ -187,7 +229,10 @@ public class FeedFragment extends Fragment {
                 } else
                     multipage = false;
 
-
+                if(document.select(".mainContent").select(".section").first().html().contains("no unread")){
+                     newposts = document.select(".mainContent").select(".section").first().select("a").attr("href");
+                    return 5;
+                }
                 Element threads = document.select(".discussionListItems").first();
 
 
@@ -249,7 +294,7 @@ public class FeedFragment extends Fragment {
                         boolean isread = n.select(".unreadLink").first() == null;
                         boolean isticky = n.select(".sticky").first() != null;
 
-                        Simpleuser su = new Simpleuser(makerid,maker,makeravatarn);
+                        Simpleuser su = new Simpleuser(makerid,maker,makeravatarn,0);
                         Simplethread st = new Simplethread(ID, title, su, latestreplydate, startdate, lastreplyname, makeravatarn, replies, views, isread, isticky);
                         st.setPages(pages);
 

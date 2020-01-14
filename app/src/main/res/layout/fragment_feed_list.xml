@@ -9,50 +9,62 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/thread_list"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="match_parent"
+            android:nestedScrollingEnabled="false"
+            android:visibility="visible"
+            app:layoutManager="LinearLayoutManager"
+
+
+            tools:listitem="@layout/thread_list_content">
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
     <TextView
         android:id="@+id/nothreads"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="There are no threads to display."
+        android:text="You have no unread posts."
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/shimmer_view_container" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/swiperefresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <TextView
+        android:id="@+id/mRecentbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:linksClickable="false"
+        android:text="View All recent posts"
+        android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        >
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/thread_list"
+        app:layout_constraintTop_toBottomOf="@+id/nothreads" />
 
-        android:layout_width="match_parent"
-
-        android:layout_height="match_parent"
-        android:nestedScrollingEnabled="false"
-        android:visibility="visible"
-        app:layoutManager="LinearLayoutManager"
-
-
-        tools:listitem="@layout/thread_list_content">
-
-
-    </androidx.recyclerview.widget.RecyclerView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/swiperefresh"
         app:layout_constraintTop_toTopOf="parent"
@@ -78,6 +90,7 @@
             <include layout="@layout/data_placeholder_layout" />
 
             <include layout="@layout/data_placeholder_layout" />
+
         </LinearLayout>
 
     </com.facebook.shimmer.ShimmerFrameLayout>

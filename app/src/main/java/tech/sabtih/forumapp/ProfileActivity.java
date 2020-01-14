@@ -258,6 +258,11 @@ public class ProfileActivity extends AppCompatActivity implements AccountFragmen
     }
 
     @Override
+    public void onRankInteraction(UserRank rank) {
+
+    }
+
+    @Override
     public void onProfilePostInteraction(Profilepost profilepost) {
 
     }
@@ -372,12 +377,15 @@ public class ProfileActivity extends AppCompatActivity implements AccountFragmen
 
                 if (!profileposts.children().first().attr("id").equals("NoProfilePosts")) {
                     for (Element post : profileposts.children()) {
+                        if(post.hasClass("deleted")){
+                            continue;
+                        }
                         ArrayList<Profilepostmessage> reps = null;
                         String ppuserid = post.select("a").first().attr("href").split("\\.")[1].replace("/", "").trim();
                         String ppname = post.select(".messageContent").select(".username").first().text();
                         String ppavatar = post.select("img").first().attr("src");
 
-                        Simpleuser ppuser = new Simpleuser(Integer.parseInt(ppuserid), ppname, ppavatar);
+                        Simpleuser ppuser = new Simpleuser(Integer.parseInt(ppuserid), ppname, ppavatar,0);
 
                         String ppid = post.attr("id").split("post-")[1].trim();
                         int pplikes = 0;
@@ -401,7 +409,7 @@ public class ProfileActivity extends AppCompatActivity implements AccountFragmen
                                     String ppruserid = ppr.select("a").first().attr("href").split("\\.")[1].replace("/", "").trim();
                                     String pprname = ppr.select(".commentContent").select(".username").first().text();
                                     String ppravatar = ppr.select("img").first().attr("src");
-                                    Simpleuser ppruser = new Simpleuser(Integer.parseInt(ppruserid), pprname, ppravatar);
+                                    Simpleuser ppruser = new Simpleuser(Integer.parseInt(ppruserid), pprname, ppravatar,0);
 
                                     String pprtime = ppr.select(".DateTime").first().text();
                                     String pprmessage = ppr.select("article").html();
@@ -436,6 +444,24 @@ public class ProfileActivity extends AppCompatActivity implements AccountFragmen
                         int rid = 0;
                         String rtitle = rank.select("strong").text();
                         String rcolor = "";
+                        if(rtitle.contains("Donator")){
+                            rcolor = "#ffaa00";
+
+                        }else if(rtitle.contains("Mod+")){
+                            rcolor = "#aa0000";
+                        }else if(rtitle.contains("Owner")){
+                            rcolor = "#ff5555";
+
+                        }else if(rtitle.contains("Mod")){
+                            rcolor = "#5555ff";
+                        }else if(rtitle.contains("Admin")){
+                            rcolor = "#00aa00";
+                        }else if(rtitle.contains("Helper")){
+                            rcolor = "#00aaaa";
+                        }else{
+                            rcolor = "#eeeeee";
+                        }
+
 
                         userranks.add(new UserRank(rid, rtitle, rcolor));
                     }

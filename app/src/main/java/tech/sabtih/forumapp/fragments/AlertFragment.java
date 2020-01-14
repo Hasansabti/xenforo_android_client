@@ -174,7 +174,7 @@ public class AlertFragment extends Fragment {
                             String userid = al.select("a").first().attr("href").split("\\.")[1].replace("/", "").trim();
                             String useravatar = al.select("img").attr("src");
                             String username = al.select("h3").select("a").first().text();
-                            Simpleuser su = new Simpleuser(Integer.parseInt(userid), username, useravatar);
+                            Simpleuser su = new Simpleuser(Integer.parseInt(userid), username, useravatar,0);
 
                            // al.select("h3").select("a").first().remove();
                             String alertid = al.attr("id").replace("alert","").trim();

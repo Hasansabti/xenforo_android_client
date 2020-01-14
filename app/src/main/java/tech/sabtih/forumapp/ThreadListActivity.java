@@ -262,7 +262,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                 Elements msglist = threads.children();
 
                 for (Element n : msglist) {
-                    if (n.hasClass("discussionListItem")) {
+                    if (n.hasClass("discussionListItem") && ! n.hasClass("deleted")) {
 
                         String tid = n.attr("id").split("-")[1];
 
@@ -317,7 +317,7 @@ public class ThreadListActivity extends AppCompatActivity implements OnForumsLis
                         boolean isread = n.select(".unreadLink").first() == null;
                         boolean isticky = n.select(".sticky").first() != null;
 
-                        Simpleuser su = new Simpleuser(makerid,maker,makeravatarn);
+                        Simpleuser su = new Simpleuser(makerid,maker,makeravatarn,0);
                         Simplethread st = new Simplethread(ID, title, su, latestreplydate, startdate, lastreplyname, makeravatarn, replies, views, isread, isticky);
                         st.setPages(pages);
 

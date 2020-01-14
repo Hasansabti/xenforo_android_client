@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Html;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONObject;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -53,12 +55,14 @@ import java.util.List;
 import im.delight.android.webview.AdvancedWebView;
 import tech.sabtih.forumapp.ProfileActivity;
 import tech.sabtih.forumapp.R;
+import tech.sabtih.forumapp.ReplyActivity;
 import tech.sabtih.forumapp.ThreadDetailActivity;
 import tech.sabtih.forumapp.ThreadListActivity;
 import tech.sabtih.forumapp.adapters.MyThreadreplyRecyclerViewAdapter;
 import tech.sabtih.forumapp.dummy.DummyContent;
 import tech.sabtih.forumapp.listeners.OnTReplyInteractionListener;
 import tech.sabtih.forumapp.models.Discussion;
+import tech.sabtih.forumapp.models.Replyform;
 import tech.sabtih.forumapp.models.user.Simpleuser;
 import tech.sabtih.forumapp.models.Threadreply;
 import tech.sabtih.forumapp.utils.MyWebViewClient;
@@ -88,6 +92,10 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
     TextView likes;
     TextView reply;
     TextView Report;
+
+    View chateditor;
+
+    TextView replyfield;
     ImageView like;
     AdvancedWebView content;
     RecyclerView threadreplies;
@@ -110,6 +118,8 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
     ArrayList<Threadreply> repliesarr;
     int scrollocation;
     Threadreply mymainpost;
+
+    Replyform rform;
 
 
     /**
@@ -175,6 +185,24 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
         loading.startShimmerAnimation();
         threadcntnt = rootView.findViewById(R.id.thrdcntnt);
         threadcntnt.setVisibility(View.INVISIBLE);
+        replyfield = rootView.findViewById(R.id.msgfield);
+        chateditor = rootView.findViewById(R.id.chateditor);
+
+        replyfield.setOnClickListener(v -> {
+            if(mymainpost != null && rform != null) {
+                Intent intent = new Intent(getContext(), ReplyActivity.class);
+                intent.putExtra("comment", mymainpost.getText());
+                intent.putExtra("url", rform.getUrl());
+                intent.putExtra("lastdate", rform.getLastdate());
+                intent.putExtra("lastkdate", rform.getLastkdate());
+                intent.putExtra("atthash", rform.getAtthash());
+                intent.putExtra("rresolver", rform.getRresolver());
+                startActivity(intent);
+
+                Log.d("myreply", rform.toString());
+            }
+
+        });
 
         url = getArguments().getString(ARG_ITEM_ID);
 
@@ -297,7 +325,10 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
                 author.setText(discussion.getAuthor());
                 date.setText(discussion.getCdate());
                 title.setText(discussion.getTitle());
+                if(rform != null) {
 
+                    chateditor.setVisibility(View.VISIBLE);
+                }
 
                 // CookieManager cookieManager = CookieManager.getInstance();
                 // cookieManager.setAcceptCookie(true);
@@ -490,7 +521,8 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
                 //Collections.reverse(repliesarr);
                 for (int i = 0; i < msglist.size(); i++) {
                     Element n = msglist.get(i);
-                    if (n.hasClass("message")) {
+                    if (n.hasClass("message") && !n.hasClass("deleted")) {
+                        n.select(".signature").remove();
 
                         Threadreply rep = parseTR(n, document, trr);
                         if (rep != null) {
@@ -509,6 +541,18 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
                 }
 
                 Discussion dis = new Discussion(tid, urls[1], title, forum, mymainpost.getSu().getName(), rdate, repliesarr);
+
+                Element replyform = document.select("#QuickReply").first();
+               // Log.d("Thread",replyform.html());
+                if(replyform != null) {
+                    String lastdate = replyform.select("input[name='last_date']").first().attr("value");
+                    String lastkdate = replyform.select("input[name='last_known_date']").first().attr("value");
+                    String rresolver = replyform.select("input[name='_xfRelativeResolver']").first().attr("value");
+                    String athash = replyform.select("input[name='attachment_hash']").first().attr("value");
+                    String url = replyform.attr("action");
+
+                    rform = new Replyform(url, "", lastdate, lastkdate, athash, rresolver);
+                }
 
 
                 return dis;
@@ -557,6 +601,7 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
         String userid = n.select(".username").attr("href").split("\\.")[1].replace("/", "");
         String avatar = n.select(".avatar").select("img").attr("src");
         int numlikes = 0;
+        int staff = 0;
         if (n.select(".LikeText").first() != null) {
             numlikes = n.select(".LikeText").select(".username").size();
             if (n.select(".LikeText").select(".OverlayTrigger").first() != null) {
@@ -567,7 +612,10 @@ public class ThreadDetailFragment extends Fragment implements OnTReplyInteractio
 
 
         }
-        Simpleuser su = new Simpleuser(Integer.parseInt(userid), username, avatar);
+        if(n.select(".bannerStaff").first() != null){
+            staff = 1;
+        }
+        Simpleuser su = new Simpleuser(Integer.parseInt(userid), username, avatar,staff);
 
         String replyto = "0";
         if (n.select(".bbCodeQuote").first() != null) {

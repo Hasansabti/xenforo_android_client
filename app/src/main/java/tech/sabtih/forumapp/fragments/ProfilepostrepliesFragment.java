@@ -205,7 +205,7 @@ getPPRepliies(""+pp.getId(),view);
                             String ppruserid = ppr.select("a").first().attr("href").split("\\.")[1].replace("/", "").trim();
                             String pprname = ppr.select(".commentContent").select(".username").first().text();
                             String ppravatar = ppr.select("img").first().attr("src");
-                            Simpleuser ppruser = new Simpleuser(Integer.parseInt(ppruserid), pprname, ppravatar);
+                            Simpleuser ppruser = new Simpleuser(Integer.parseInt(ppruserid), pprname, ppravatar,0);
 
                             String pprtime = ppr.select(".DateTime").first().text();
                             String pprmessage = ppr.select("article").html();

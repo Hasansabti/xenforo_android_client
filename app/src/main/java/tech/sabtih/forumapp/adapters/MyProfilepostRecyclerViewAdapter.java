@@ -16,7 +16,7 @@ import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
 import tech.sabtih.forumapp.ProfileActivity;
 import tech.sabtih.forumapp.R;
-import tech.sabtih.forumapp.fragments.ProfileFragment.OnListFragmentInteractionListener;
+
 import tech.sabtih.forumapp.dummy.DummyContent.DummyItem;
 import tech.sabtih.forumapp.listeners.OnProfilePostInteractionListener;
 import tech.sabtih.forumapp.models.Profilepost;
@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * specified {@link tech.sabtih.forumapp.listeners.OnProfileInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyProfilepostRecyclerViewAdapter extends RecyclerView.Adapter<MyProfilepostRecyclerViewAdapter.ViewHolder> {

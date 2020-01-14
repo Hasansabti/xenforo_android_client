@@ -372,7 +372,7 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
                                 if (el.select("a").first() != null)
                                     avatar = el.select("a").first().select("img").attr("src");
 
-                                Simpleuser user = new Simpleuser(userid, name, avatar);
+                                Simpleuser user = new Simpleuser(userid, name, avatar,0);
                                 String textcolor = "#000000";
                                 if (el.select("span").last() != null && el.select("span").last().hasAttr("style") && el.select("span").last().attr("style").contains("color"))
                                     textcolor = el.select("span").last().attr("style").split(":")[1].trim();
@@ -606,13 +606,13 @@ delete:http://itsjerryandharry.com/taigachat/168394/delete
     }
 
     void startRepeatingTask() {
-        mStatusChecker.run();
+      //  mStatusChecker.run();
     }
 
     void stopRepeatingTask() {
 
 
-        mHandler.removeCallbacks(mStatusChecker);
+    //    mHandler.removeCallbacks(mStatusChecker);
     }
 
     @Override
